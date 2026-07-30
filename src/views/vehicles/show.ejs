@@ -1,0 +1,54 @@
+<div class="page-title"><%= vehicle.plate_number %></div>
+
+<div class="row g-3 mb-3">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">Thông tin xe</div>
+      <div class="card-body">
+        <table class="table table-sm mb-0 small">
+          <tr><th style="width:140px">Biển số</th><td><%= vehicle.plate_number %></td></tr>
+          <tr><th>Điện thoại</th><td><%= vehicle.phone || '-' %></td></tr>
+          <tr><th>Đăng kiểm</th><td><%= fd(vehicle.registration_expiry) || '-' %></td></tr>
+          <tr><th>Bảo hiểm</th><td><%= fd(vehicle.insurance_expiry) || '-' %></td></tr>
+          <tr><th>BH Thân vỏ</th><td><%= fd(vehicle.body_insurance_expiry) || '-' %></td></tr>
+          <tr><th>KM bảo dưỡng</th><td><%= vehicle.maintenance_km ? vehicle.maintenance_km.toLocaleString() + ' km' : '-' %></td></tr>
+          <tr><th>KM hiện tại</th><td><%= vehicle.current_km ? vehicle.current_km.toLocaleString() + ' km' : '-' %></td></tr>
+          <tr><th>Ghi chú</th><td><%= vehicle.notes || '-' %></td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Lịch sử chuyến</span>
+        <a href="/trips/new?vehicle_id=<%= vehicle.id %>" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i></a>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-sm mb-0 small">
+            <thead><tr><th>Ngày</th><th>Tài xế</th><th>Giờ</th><th>Nơi đến</th><th>Km</th></tr></thead>
+            <tbody>
+              <% if (trips.length === 0) { %>
+                <tr><td colspan="5" class="text-muted text-center py-2">Chưa có chuyến nào</td></tr>
+              <% } else { %>
+                <% trips.forEach(t => { %>
+                  <tr>
+                    <td><%= fd(t.trip_date) %></td>
+                    <td><%= t.driver_name %></td>
+                    <td><%= t.time_range || '-' %></td>
+                    <td><%= t.destination || '-' %></td>
+                    <td><%= t.km_reading || '-' %></td>
+                  </tr>
+                <% }); %>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<a href="/vehicles" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left me-1"></i>Quay lại</a>
+<a href="/vehicles/<%= vehicle.id %>/edit" class="btn btn-primary btn-sm"><i class="bi bi-pencil me-1"></i>Sửa</a>

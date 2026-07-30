@@ -1,0 +1,54 @@
+<div class="page-title"><%= title %></div>
+
+<div class="card">
+  <div class="card-body">
+    <form method="POST">
+      <div class="row g-2 mb-2">
+        <div class="col-md-6">
+          <label class="form-label small">Tên công ty</label>
+          <input name="name" class="form-control form-control-sm" value="<%= info.name %>" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small">Điện thoại</label>
+          <input name="phone" class="form-control form-control-sm" value="<%= info.phone %>" required>
+        </div>
+      </div>
+      <div class="mb-2">
+        <label class="form-label small">Địa chỉ</label>
+        <input name="address" class="form-control form-control-sm" value="<%= info.address %>" required>
+      </div>
+      <div class="row g-2 mb-2">
+        <div class="col-md-6">
+          <label class="form-label small">Email</label>
+          <input name="email" class="form-control form-control-sm" value="<%= info.email %>" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small">Website</label>
+          <input name="website" class="form-control form-control-sm" value="<%= info.website || '' %>">
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small">Link tra phạt nguội</label>
+        <input name="fine_check_url" class="form-control form-control-sm" value="<%= info.fine_check_url %>" required>
+      </div>
+      <% if (true) { %>
+        <button class="btn btn-primary btn-sm"><i class="bi bi-save me-1"></i>Cập nhật</button>
+      <% } %>
+    </form>
+  </div>
+</div>
+
+<div class="card mt-3">
+  <div class="card-header">Liên kết nhanh</div>
+  <div class="card-body">
+    <a href="<%= info.fine_check_url %>" target="_blank" class="btn btn-outline-danger btn-sm">
+      <i class="bi bi-shield-exclamation me-1"></i>Tra phạt nguội
+    </a>
+    <a href="tel:<%= info.phone %>" class="btn btn-outline-primary btn-sm ms-1">
+      <i class="bi bi-telephone me-1"></i>Gọi: <%= info.phone %>
+    </a>
+    <a href="mailto:<%= info.email %>" class="btn btn-outline-primary btn-sm ms-1">
+      <i class="bi bi-envelope me-1"></i><%= info.email %>
+    </a>
+  </div>
+</div>

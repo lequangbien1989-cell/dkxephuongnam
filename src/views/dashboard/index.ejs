@@ -1,0 +1,183 @@
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card stat-card">
+      <div class="number"><%= totalVehicles %></div>
+      <div class="label">Xe đang hoạt động</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card stat-card">
+      <div class="number"><%= activeDrivers %></div>
+      <div class="label">Tài xế</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card stat-card">
+      <div class="number"><%= tripsThisMonth %></div>
+      <div class="label">Chuyến trong tháng</div>
+    </div>
+  </div>
+</div>
+
+<!-- Alerts -->
+<% var _hasAlert = false; for (var _ai=0;_ai<alerts.length;_ai++){if(alerts[_ai].status!=='safe'){_hasAlert=true;break;}} %>
+<% if (_hasAlert) { %>
+  <div class="card">
+    <div class="card-header"><i class="bi bi-exclamation-triangle text-warning me-1"></i>Cảnh báo hết hạn</div>
+    <div class="card-body">
+      <div class="row g-2">
+        <% for (var _vi=0;_vi<alerts.length;_vi++){var _v=alerts[_vi];if(_v.status==='safe'){continue;} %>
+          <div class="col-md-4">
+            <div class="border rounded p-3 <%= _v.status==='expired'?'border-danger':'border-warning' %>">
+              <div class="fw-bold"><%= _v.plate_number %></div>
+              <% for (var _ii=0;_ii<_v.items.length;_ii++){var _i=_v.items[_ii];if(_i.days>30){continue;} %>
+                <div class="small mt-1">
+                  <span class="badge <%= _i.days<=0?'badge-expired':'badge-warning' %>"><%= _i.days<=0?'Hết hạn':'Sắp hết hạn' %></span>
+                  <%= _i.type %>: <strong><%= fd(_i.date) %></strong>
+                  <% if (_i.days>0) { %><span class="text-muted">(còn <%= _i.days %> ngày)</span><% } %>
+                </div>
+              <% } %>
+            </div>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+<% } %>
+
+<!-- Quick add trip + Today's trips -->
+<div class="row g-3">
+  <div class="col-md-5">
+    <div class="card">
+      <div class="card-header"><i class="bi bi-plus-circle me-1"></i>Thêm chuyến nhanh</div>
+      <div class="card-body">
+        <% if (typeof conflict !== 'undefined' && conflict) { %>
+          <div class="alert alert-warning py-2 small"><%= conflict %></div>
+        <% } %>
+        <form method="POST" action="/trips">
+          <div class="mb-2">
+            <label class="form-label small">Ngày</label>
+            <input type="date" name="trip_date" class="form-control form-control-sm" value="<%= today %>" required>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">Xe</label>
+            <select name="vehicle_id" class="form-select form-select-sm" required>
+              <option value="">-- Chọn xe --</option>
+              <% vehicles.forEach(v => { %>
+                <option value="<%= v.id %>" <%= typeof vehicle_id !== 'undefined' && vehicle_id==v.id?'selected':'' %>><%= v.plate_number %></option>
+              <% }); %>
+            </select>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">Tài xế</label>
+            <select name="driver_name" class="form-select form-select-sm" required>
+              <option value="">-- Chọn tài xế --</option>
+              <% drivers.forEach(d => { %>
+                <option value="<%= d.name %>"><%= d.name %></option>
+              <% }); %>
+            </select>
+          </div>
+          <div class="row g-1 mb-2">
+            <div class="col-6">
+              <label class="form-label small">Khung giờ</label>
+              <select name="time_range" class="form-select form-select-sm">
+                <option value="">-- Chọn giờ --</option>
+                <option value="7h-17h">7h - 17h (Cả ngày)</option>
+                <option value="7h-12h">7h - 12h (Sáng)</option>
+                <option value="12h-17h">12h - 17h (Chiều)</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="form-label small">Nơi đến</label>
+              <input name="destination" class="form-control form-control-sm" placeholder="VD: Bình Dương">
+            </div>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">Số km</label>
+            <input type="number" name="km_reading" class="form-control form-control-sm">
+          </div>
+          <button class="btn btn-primary btn-sm w-100"><i class="bi bi-save me-1"></i>Lưu chuyến</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-7">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-calendar-day me-1"></i>Chuyến hôm nay (<%= fd(today) %>)</span>
+        <a href="/trips" class="btn btn-outline-primary btn-sm">Xem tất cả</a>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0 small">
+            <thead>
+              <tr><th>Giờ</th><th>Xe</th><th>Tài xế</th><th>Nơi đến</th><th>Km</th></tr>
+            </thead>
+            <tbody>
+              <% if (todayTrips.length === 0) { %>
+                <tr><td colspan="5" class="text-muted text-center py-3">Chưa có chuyến nào hôm nay</td></tr>
+              <% } else { %>
+                <% todayTrips.forEach(t => { %>
+                  <tr>
+                    <td><%= t.time_range || '-' %></td>
+                    <td><%= t.plate_number %></td>
+                    <td><%= t.driver_name %></td>
+                    <td><%= t.destination || '-' %></td>
+                    <td><%= t.km_reading || '-' %></td>
+                  </tr>
+                <% }); %>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- All vehicles expiry overview -->
+<div class="card mt-3">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span><i class="bi bi-truck me-1"></i>Tình trạng xe</span>
+    <a href="/vehicles" class="btn btn-outline-primary btn-sm">Chi tiết</a>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0 small">
+        <thead>
+          <tr><th>Biển số</th><th>Đăng kiểm</th><th>Bảo hiểm</th><th>BH Thân vỏ</th><th>KM bảo dưỡng</th></tr>
+        </thead>
+        <tbody>
+          <% alerts.forEach(v => { %>
+            <tr>
+              <td class="fw-bold"><%= v.plate_number %></td>
+              <td>
+                <% if (v.registration_expiry) { var d = du(v.registration_expiry); var cls = d<=0?'badge-expired':d<=30?'badge-warning':'badge-safe'; %>
+                  <span class="badge <%= cls %>"><%= fd(v.registration_expiry) %></span>
+                <% } else { %><span class="text-muted">--</span><% } %>
+              </td>
+              <td>
+                <% if (v.insurance_expiry) { var d = du(v.insurance_expiry); var cls = d<=0?'badge-expired':d<=30?'badge-warning':'badge-safe'; %>
+                  <span class="badge <%= cls %>"><%= fd(v.insurance_expiry) %></span>
+                <% } else { %><span class="text-muted">--</span><% } %>
+              </td>
+              <td>
+                <% if (v.body_insurance_expiry) { var d = du(v.body_insurance_expiry); var cls = d<=0?'badge-expired':d<=30?'badge-warning':'badge-safe'; %>
+                  <span class="badge <%= cls %>"><%= fd(v.body_insurance_expiry) %></span>
+                <% } else { %><span class="text-muted">--</span><% } %>
+              </td>
+              <td><%= v.maintenance_km ? v.maintenance_km.toLocaleString() + ' km' : '--' %></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Fine check link -->
+<div class="mt-3">
+  <a href="https://www.csgt.vn/tra-cuu-phuong-tien-vi-pham.html" target="_blank" class="btn btn-outline-danger btn-sm">
+    <i class="bi bi-shield-exclamation me-1"></i>Tra phạt nguội
+  </a>
+</div>

@@ -1,0 +1,270 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div class="page-title"><%= title %></div>
+  <a href="/trips/new" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>Thêm chuyến</a>
+</div>
+
+<!-- Tab buttons -->
+<ul class="nav nav-pills mb-3" id="tripTabs" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="calendar-tab" data-bs-toggle="pill" data-bs-target="#calendar-view" type="button" role="tab">📅 Lịch</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="table-tab" data-bs-toggle="pill" data-bs-target="#table-view" type="button" role="tab">📋 Bảng</button>
+  </li>
+</ul>
+
+<div class="tab-content">
+  <!-- ========== TABLE VIEW ========== -->
+  <div class="tab-pane fade show active" id="table-view" role="tabpanel" tabindex="0">
+    <div class="card mb-3">
+      <div class="card-body py-2">
+        <form class="row g-2 align-items-end">
+          <div class="col-auto">
+            <label class="form-label small">Từ ngày</label>
+            <input type="date" name="date_from" class="form-control form-control-sm" value="<%= filters.date_from || '' %>">
+          </div>
+          <div class="col-auto">
+            <label class="form-label small">Đến ngày</label>
+            <input type="date" name="date_to" class="form-control form-control-sm" value="<%= filters.date_to || '' %>">
+          </div>
+          <div class="col-auto">
+            <label class="form-label small">Xe</label>
+            <select name="vehicle_id" class="form-select form-select-sm">
+              <option value="">Tất cả</option>
+              <% vehicles.forEach(v => { %>
+                <option value="<%= v.id %>" <%= filters.vehicle_id == v.id ? 'selected' : '' %>><%= v.plate_number %></option>
+              <% }); %>
+            </select>
+          </div>
+          <div class="col-auto">
+            <label class="form-label small">Tài xế</label>
+            <input name="driver" class="form-control form-control-sm" value="<%= filters.driver || '' %>" list="driverFilterList" placeholder="Tên...">
+            <datalist id="driverFilterList">
+              <% drivers.forEach(d => { %><option value="<%= d.driver_name %>"><% }); %>
+            </datalist>
+          </div>
+          <div class="col-auto">
+            <button class="btn btn-primary btn-sm"><i class="bi bi-search me-1"></i>Lọc</button>
+            <a href="/trips" class="btn btn-outline-secondary btn-sm">Xoá</a>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0 small">
+            <thead>
+              <tr><th>Ngày</th><th>Xe</th><th>Tài xế</th><th>Giờ</th><th>Nơi đến</th><th>Km</th><th></th></tr>
+            </thead>
+            <tbody>
+              <% if (trips.length === 0) { %>
+                <tr><td colspan="7" class="text-muted text-center py-4">Không tìm thấy chuyến nào</td></tr>
+              <% } else { %>
+                <% trips.forEach(t => { %>
+                  <tr>
+                    <td><%= fd(t.trip_date) %></td>
+                    <td class="fw-bold"><%= t.plate_number %></td>
+                    <td><%= t.driver_name %></td>
+                    <td><%= t.time_range || '-' %></td>
+                    <td><%= t.destination || '-' %></td>
+                    <td><%= t.km_reading ? t.km_reading.toLocaleString() : '-' %></td>
+                    <td class="text-nowrap">
+                      <a href="/trips/<%= t.id %>/edit" class="btn btn-outline-secondary btn-sm py-0"><i class="bi bi-pencil"></i></a>
+                      <form method="POST" action="/trips/<%= t.id %>/delete" class="d-inline" onsubmit="return confirm('Xoá chuyến ngày <%= t.trip_date %>?')">
+                        <button class="btn btn-outline-danger btn-sm py-0"><i class="bi bi-trash"></i></button>
+                      </form>
+                    </td>
+                  </tr>
+                <% }); %>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== CALENDAR VIEW ========== -->
+  <div class="tab-pane fade" id="calendar-view" role="tabpanel" tabindex="0">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <button class="btn btn-outline-secondary btn-sm" onclick="calendar.move(-1)">◀</button>
+          <h5 class="mb-0" id="calMonth"></h5>
+          <button class="btn btn-outline-secondary btn-sm" onclick="calendar.move(1)">▶</button>
+        </div>
+
+        <!-- Legend -->
+        <div class="small mb-2 text-muted" id="calLegend"></div>
+
+        <!-- Grid -->
+        <div id="calGrid" class="calendar-grid"></div>
+
+        <!-- Modal click day -->
+        <div class="modal fade" id="dayModal" tabindex="-1">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h6 class="modal-title" id="dayModalTitle"></h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body p-0" id="dayModalBody"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.calendar-grid .cal-header { text-align: center; font-weight: 600; font-size: .8rem; padding: 6px 2px; color: #555; }
+.calendar-grid .cal-day { min-height: 70px; background: #fff; border: 1px solid #eee; border-radius: 4px; padding: 4px; cursor: pointer; transition: .15s; }
+.calendar-grid .cal-day:hover { box-shadow: 0 1px 6px rgba(0,0,0,.1); border-color: #3498db; }
+.calendar-grid .cal-day .day-num { font-size: .8rem; font-weight: 600; color: #333; }
+.calendar-grid .cal-day.other-month .day-num { color: #ccc; }
+.calendar-grid .cal-day.today { background: #eef6ff; border-color: #3498db; }
+.calendar-grid .cal-day .cal-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin: 1px; }
+.calendar-grid .cal-day .cal-dot-wrap { margin-top: 2px; line-height: 1; }
+.day-trip-row { border-bottom: 1px solid #eee; padding: 8px 12px; display: flex; align-items: center; gap: 12px; }
+.day-trip-row:last-child { border-bottom: none; }
+.day-trip-row .color-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+</style>
+
+<script>
+const calendar = {
+  currentMonth: '',
+  vehicleColors: {},
+  vehicles: [],
+
+  init() {
+    const now = new Date();
+    this.currentMonth = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+    this.load();
+  },
+
+  async load() {
+    const res = await fetch('/api/calendar?month=' + this.currentMonth);
+    const data = await res.json();
+
+    this.vehicles = data.vehicles;
+    data.vehicles.forEach(v => { this.vehicleColors[v.plate_number] = v.color; });
+
+    // Legend
+    const legend = document.getElementById('calLegend');
+    legend.innerHTML = data.vehicles.map(v =>
+      '<span class="me-2"><span class="cal-dot" style="background:'+v.color+'"></span> '+v.plate_number+'</span>'
+    ).join('');
+
+    // Title
+    const [y,m] = this.currentMonth.split('-').map(Number);
+    const months = ['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6','Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'];
+    document.getElementById('calMonth').textContent = months[m-1] + ' ' + y;
+
+    // Render
+    this.render(data);
+  },
+
+  render(data) {
+    const [y,m] = this.currentMonth.split('-').map(Number);
+    const firstDow = new Date(y, m-1, 1).getDay(); // 0=Sun
+    const daysInMonth = data.endDay;
+    const prevMonthDays = new Date(y, m-1, 0).getDate();
+
+    const todayStr = new Date().toISOString().slice(0,10);
+    const dowNames = ['CN','T2','T3','T4','T5','T6','T7'];
+
+    let html = '';
+    // Header row
+    dowNames.forEach(d => { html += '<div class="cal-header">'+d+'</div>'; });
+
+    // Empty cells for days before 1st
+    for (let i = 0; i < firstDow; i++) {
+      html += '<div class="cal-day other-month"><div class="day-num">'+(prevMonthDays - firstDow + 1 + i)+'</div></div>';
+    }
+
+    // Day cells
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = this.currentMonth + '-' + String(d).padStart(2,'0');
+      const dayTrips = data.days[dateStr] || [];
+      const isToday = dateStr === todayStr;
+
+      let dotsHtml = '';
+      if (dayTrips.length > 0) {
+        // Collect unique vehicles with their color
+        const seen = new Set();
+        const uniqueDots = [];
+        dayTrips.forEach(t => {
+          if (!seen.has(t.plate_number)) {
+            seen.add(t.plate_number);
+            uniqueDots.push(t.plate_number);
+          }
+        });
+        dotsHtml = '<div class="cal-dot-wrap">' +
+          uniqueDots.map(p => '<span class="cal-dot" style="background:'+(this.vehicleColors[p]||'#999')+'" title="'+p+'"></span>').join('') +
+          (dayTrips.length > uniqueDots.length ? ' <span class="text-muted" style="font-size:.7rem">+'+(dayTrips.length-uniqueDots.length)+'</span>' : '') +
+        '</div>';
+      }
+
+      html += '<div class="cal-day'+(isToday?' today':'')+'" onclick="calendar.showDay(\''+dateStr+'\')">' +
+        '<div class="day-num">'+d+'</div>' + dotsHtml +
+      '</div>';
+    }
+
+    // Empty cells after last day
+    const lastCol = (firstDow + daysInMonth) % 7;
+    if (lastCol !== 0) {
+      for (let i = lastCol; i < 7; i++) {
+        html += '<div class="cal-day other-month"><div class="day-num">'+(i - lastCol + 1)+'</div></div>';
+      }
+    }
+
+    document.getElementById('calGrid').innerHTML = html;
+  },
+
+  async showDay(dateStr) {
+    const res = await fetch('/api/calendar?month=' + dateStr.slice(0,7));
+    const data = await res.json();
+    const trips = data.days[dateStr] || [];
+
+    document.getElementById('dayModalTitle').textContent = '📅 ' + dateStr.split('-').reverse().join('/');
+
+    let body = '';
+    if (trips.length === 0) {
+      body = '<div class="p-4 text-center text-muted">Không có chuyến nào trong ngày này</div>';
+    } else {
+      body = trips.map(t =>
+        '<div class="day-trip-row">' +
+          '<span class="color-dot" style="background:'+(this.vehicleColors[t.plate_number]||'#999')+'"></span>' +
+          '<div class="fw-bold" style="min-width:80px">'+t.plate_number+'</div>' +
+          '<div style="min-width:70px">'+(t.time_range||'-')+'</div>' +
+          '<div style="min-width:70px">'+t.driver_name+'</div>' +
+          '<div style="min-width:80px">'+(t.destination||'-')+'</div>' +
+          '<div class="text-muted">'+(t.km_reading ? t.km_reading.toLocaleString()+' km' : '')+'</div>' +
+          '<div class="ms-auto text-nowrap">' +
+            '<a href="/trips/'+t.id+'/edit" class="btn btn-outline-secondary btn-sm py-0"><i class="bi bi-pencil"></i></a>' +
+            '<form method="POST" action="/trips/'+t.id+'/delete" class="d-inline" onsubmit="return confirm(\'Xoá chuyến?\')">' +
+              '<button class="btn btn-outline-danger btn-sm py-0 ms-1"><i class="bi bi-trash"></i></button>' +
+            '</form>' +
+          '</div>' +
+        '</div>'
+      ).join('');
+    }
+    document.getElementById('dayModalBody').innerHTML = body;
+
+    const modal = new bootstrap.Modal(document.getElementById('dayModal'));
+    modal.show();
+  },
+
+  move(delta) {
+    const [y,m] = this.currentMonth.split('-').map(Number);
+    const d = new Date(y, m-1 + delta, 1);
+    this.currentMonth = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+    this.load();
+  }
+};
+
+document.addEventListener('DOMContentLoaded', () => calendar.init());
+</script>
