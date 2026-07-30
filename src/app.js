@@ -3,6 +3,10 @@ const expressLayouts = require('express-ejs-layouts');
 const path = require('path');
 const { getDb } = require('./db/database');
 const { seed } = require('./db/seed');
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
 
 // Init DB + seed
 getDb();
