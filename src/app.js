@@ -3,9 +3,7 @@ const expressLayouts = require('express-ejs-layouts');
 const path = require('path');
 const { getDb } = require('./db/database');
 const { seed } = require('./db/seed');
-// 1. Khởi tạo app trước
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 // Init DB + seed
 getDb();
