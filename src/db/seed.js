@@ -21,6 +21,8 @@ async function seed() {
         await query(`UPDATE vehicles SET vehicle_type=$1 WHERE id=$2`, [typeByPlate[v.plate_number], v.id]);
       }
     }
+    // Cập nhật link tra phạt nguội mới
+    await query(`UPDATE company_info SET fine_check_url=$1 WHERE id=1`, ['https://phatnguoi.com/']);
     return;
   }
 
@@ -37,7 +39,7 @@ async function seed() {
       '99 QL 1A, Phường Tân Thới Nhất, Quận 12, TP HCM',
       '028 3590 1968',
       'hi@phuongnampanel.com',
-      'https://www.csgt.vn/tra-cuu-phuong-tien-vi-pham.html']);
+      'https://phatnguoi.com/']);
 
   // Vehicles [plate, type, phone, reg, ins, body, maint_km]
   const vehicles = [

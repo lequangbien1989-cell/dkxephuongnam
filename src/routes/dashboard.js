@@ -58,11 +58,15 @@ router.get('/', async (req, res) => {
   // Driver list
   const drivers = (await query('SELECT name FROM drivers WHERE is_active = 1 ORDER BY name')).rows;
 
+  // Fine check link from company info
+  const company = (await query('SELECT fine_check_url FROM company_info WHERE id = 1')).rows[0];
+  const fineCheckUrl = (company && company.fine_check_url) || 'https://phatnguoi.com/';
+
   res.render('dashboard/index', {
     title: 'Tổng quan',
     totalVehicles, activeDrivers, tripsThisMonth,
     alerts, todayTrips, weekTrips, today, vehicles, drivers,
-    daysUntil, fmtDate
+    daysUntil, fmtDate, fineCheckUrl
   });
 });
 
