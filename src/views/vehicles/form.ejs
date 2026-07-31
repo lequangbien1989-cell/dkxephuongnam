@@ -13,6 +13,15 @@
           <input name="plate_number" class="form-control form-control-sm" value="<%= vehicle.plate_number || '' %>" required>
         </div>
         <div class="col-md-4">
+          <label class="form-label small">Loại xe</label>
+          <select name="vehicle_type" class="form-select form-select-sm">
+            <option value="Toyota" <%= vehicle.vehicle_type === 'Toyota' ? 'selected' : '' %>>Toyota</option>
+            <option value="Mitsubishi" <%= vehicle.vehicle_type === 'Mitsubishi' ? 'selected' : '' %>>Mitsubishi</option>
+            <option value="VinFast" <%= vehicle.vehicle_type === 'VinFast' ? 'selected' : '' %>>VinFast</option>
+            <option value="Khác" <%= vehicle.vehicle_type === 'Khác' ? 'selected' : '' %>>Khác</option>
+          </select>
+        </div>
+        <div class="col-md-4">
           <label class="form-label small">Điện thoại</label>
           <input name="phone" class="form-control form-control-sm" value="<%= vehicle.phone || '' %>" placeholder="0932xxx (tên)">
         </div>

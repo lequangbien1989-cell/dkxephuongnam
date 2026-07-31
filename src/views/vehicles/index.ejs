@@ -13,7 +13,7 @@
         <tbody>
           <% vehicles.forEach(v => { %>
             <tr>
-              <td class="fw-bold"><a href="/vehicles/<%= v.id %>"><%= v.plate_number %></a></td>
+              <td class="fw-bold"><% var _vi4 = vi(v.vehicle_type); %><span title="<%= _vi4.label %>"><%= _vi4.icon %></span> <a href="/vehicles/<%= v.id %>"><%= v.plate_number %></a></td>
               <td><%= v.phone || '-' %></td>
               <td>
                 <% if (v.registration_expiry) { var d = du(v.registration_expiry); var cls = d<=0?'badge-expired':d<=30?'badge-warning':'badge-safe'; %>

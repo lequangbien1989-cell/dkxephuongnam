@@ -40,7 +40,7 @@ router.get('/', async (req, res) => {
 
   // Next 7 days trips (today + 6 upcoming days)
   const next7 = new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
-  const weekTrips = (await query(`SELECT t.*, v.plate_number FROM trips t JOIN vehicles v ON t.vehicle_id = v.id WHERE t.trip_date >= $1 AND t.trip_date <= $2 ORDER BY t.trip_date, t.created_at`, [today, next7])).rows
+  const weekTrips = (await query(`SELECT t.*, v.plate_number, v.vehicle_type FROM trips t JOIN vehicles v ON t.vehicle_id = v.id WHERE t.trip_date >= $1 AND t.trip_date <= $2 ORDER BY t.trip_date, t.created_at`, [today, next7])).rows
     .map(t => ({ ...t, trip_date: fmtDate(t.trip_date) }));
   const todayTrips = weekTrips.filter(t => t.trip_date === today);
 

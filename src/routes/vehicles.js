@@ -21,10 +21,10 @@ router.get('/new', (req, res) => {
 
 // Create
 router.post('/', async (req, res) => {
-  const { plate_number, phone, registration_expiry, insurance_expiry, body_insurance_expiry, maintenance_km, notes } = req.body;
+  const { plate_number, vehicle_type, phone, registration_expiry, insurance_expiry, body_insurance_expiry, maintenance_km, notes } = req.body;
   try {
-    await query(`INSERT INTO vehicles (plate_number, phone, registration_expiry, insurance_expiry, body_insurance_expiry, maintenance_km, notes) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-      [plate_number, phone, registration_expiry || null, insurance_expiry || null, body_insurance_expiry || null, maintenance_km || null, notes || null]);
+    await query(`INSERT INTO vehicles (plate_number, vehicle_type, phone, registration_expiry, insurance_expiry, body_insurance_expiry, maintenance_km, notes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+      [plate_number, vehicle_type || 'Toyota', phone, registration_expiry || null, insurance_expiry || null, body_insurance_expiry || null, maintenance_km || null, notes || null]);
     res.redirect('/vehicles');
   } catch (e) {
     res.render('vehicles/form', { title: 'Thêm xe', vehicle: req.body, error: e.message });
@@ -50,14 +50,15 @@ router.get('/:id/edit', async (req, res) => {
 
 // Update
 router.post('/:id', async (req, res) => {
-  const { plate_number, phone, registration_expiry, insurance_expiry, body_insurance_expiry, maintenance_km, current_km, notes } = req.body;
+  const { plate_number, vehicle_type, phone, registration_expiry, insurance_expiry, body_insurance_expiry, maintenance_km, current_km, notes } = req.body;
   // Lấy dữ liệu cũ để giữ lại các field không điền
   const oldResult = await query('SELECT * FROM vehicles WHERE id = $1', [req.params.id]);
   const old = oldResult.rows[0];
   if (!old) return res.redirect('/vehicles');
   try {
-    await query(`UPDATE vehicles SET plate_number=$1, phone=$2, registration_expiry=$3, insurance_expiry=$4, body_insurance_expiry=$5, maintenance_km=$6, current_km=$7, notes=$8, updated_at=NOW() WHERE id=$9`,
+    await query(`UPDATE vehicles SET plate_number=$1, vehicle_type=$2, phone=$3, registration_expiry=$4, insurance_expiry=$5, body_insurance_expiry=$6, maintenance_km=$7, current_km=$8, notes=$9, updated_at=NOW() WHERE id=$10`,
       [plate_number,
+        vehicle_type || old.vehicle_type || 'Toyota',
         phone !== undefined && phone !== '' ? phone : old.phone,
         registration_expiry || old.registration_expiry,
         insurance_expiry || old.insurance_expiry,

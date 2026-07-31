@@ -40,6 +40,7 @@ async function initSchema() {
     CREATE TABLE IF NOT EXISTS vehicles (
       id                    SERIAL PRIMARY KEY,
       plate_number          TEXT UNIQUE NOT NULL,
+      vehicle_type          TEXT DEFAULT 'Toyota',
       phone                 TEXT,
       registration_expiry   DATE,
       insurance_expiry      DATE,
@@ -101,6 +102,13 @@ async function initSchema() {
       fine_check_url TEXT NOT NULL
     );
   `);
+
+  // Thêm cột vehicle_type nếu bảng vehicles đã tồn tại từ trước (Supabase đang chạy)
+  try {
+    await db.query(`ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS vehicle_type TEXT DEFAULT 'Toyota'`);
+  } catch (e) {
+    // Cột đã tồn tại hoặc lỗi không quan trọng
+  }
 }
 
 module.exports = { getPool, query, initSchema };

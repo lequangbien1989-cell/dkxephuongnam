@@ -154,7 +154,8 @@
                     </td>
                     <td><%= t.time_range || '-' %></td>
                     <td>
-                      <span class="vehicle-dot" style="background:<%= t.color || '#999' %>"></span>
+                      <% var _vi = vi(t.vehicle_type); %>
+                      <span title="<%= _vi.label %>" style="color:<%= t.color || '#333' %>"><%= _vi.icon %></span>
                       <span class="fw-bold" style="color:<%= t.color || '#333' %>"><%= t.plate_number %></span>
                     </td>
                     <td><%= t.driver_name %></td>
@@ -187,7 +188,8 @@
           <% alerts.forEach(v => { %>
             <tr>
               <td>
-                <span class="vehicle-dot" style="background:<%= v.color || '#999' %>"></span>
+                <% var _vi2 = vi(v.vehicle_type); %>
+                <span title="<%= _vi2.label %>" style="color:<%= v.color || '#333' %>"><%= _vi2.icon %></span>
                 <span class="fw-bold" style="color:<%= v.color || '#333' %>"><%= v.plate_number %></span>
               </td>
               <td>

@@ -36,9 +36,9 @@ async function main() {
   // --- vehicles ---
   const vehicles = old.prepare('SELECT * FROM vehicles').all();
   for (const v of vehicles) {
-    await query(`INSERT INTO vehicles (id, plate_number, phone, registration_expiry, insurance_expiry, body_insurance_expiry, maintenance_km, current_km, notes, is_active)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) ON CONFLICT (id) DO NOTHING`,
-      [v.id, v.plate_number, v.phone, v.registration_expiry, v.insurance_expiry, v.body_insurance_expiry, v.maintenance_km, v.current_km || 0, v.notes, v.is_active]);
+    await query(`INSERT INTO vehicles (id, plate_number, vehicle_type, phone, registration_expiry, insurance_expiry, body_insurance_expiry, maintenance_km, current_km, notes, is_active)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) ON CONFLICT (id) DO NOTHING`,
+      [v.id, v.plate_number, v.vehicle_type || 'Toyota', v.phone, v.registration_expiry, v.insurance_expiry, v.body_insurance_expiry, v.maintenance_km, v.current_km || 0, v.notes, v.is_active]);
   }
   console.log('✅ vehicles:', vehicles.length);
 

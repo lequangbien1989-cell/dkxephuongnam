@@ -41,12 +41,20 @@ function daysUntil(v) {
   if (!v) return Infinity;
   return Math.ceil((new Date(toDateStr(v)) - new Date()) / (1000 * 60 * 60 * 24));
 }
+// Biểu tượng xe theo loại (icon + label)
+function vehicleIcon(type) {
+  const t = (type || 'Khác').toLowerCase();
+  if (t.includes('vin')) return { icon: '⚡', label: 'VinFast' };
+  if (t.includes('mitsu')) return { icon: '🚙', label: 'Mitsubishi' };
+  return { icon: '🚗', label: 'Toyota' };
+}
 
 // Middleware: make helpers available to all views
 app.use((req, res, next) => {
   res.locals.currentPath = req.path;
   res.locals.fd = formatDate;
   res.locals.du = daysUntil;
+  res.locals.vi = vehicleIcon;
   next();
 });
 
