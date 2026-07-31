@@ -3,8 +3,13 @@ const expressLayouts = require('express-ejs-layouts');
 const path = require('path');
 const { getDb } = require('./db/database');
 const { seed } = require('./db/seed');
+
+// Chỉ dùng 1 dòng khai báo 'app' này duy nhất:
 const app = express();
 
+// ... các cấu hình app.use(), app.set() khác ...
+
+module.exports = app;
 // Init DB + seed
 getDb();
 seed();
