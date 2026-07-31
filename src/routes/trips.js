@@ -108,7 +108,7 @@ async function renderDashboard(res, vehicle_id, conflict) {
   const today = new Date().toISOString().slice(0, 10);
   const totalVehicles = (await query('SELECT COUNT(*) as c FROM vehicles WHERE is_active = 1')).rows[0].c;
   const activeDrivers = (await query('SELECT COUNT(*) as c FROM drivers WHERE is_active = 1')).rows[0].c;
-  const tripsThisMonth = (await query(`SELECT COUNT(*) as c FROM trips WHERE trip_date >= date_trunc('month', CURRENT_DATE)`)).rows[0].c;
+  const tripsThisMonth = (await query(`SELECT COUNT(*) as c FROM trips WHERE trip_date >= date_trunc('month', CURRENT_DATE) AND trip_date < date_trunc('month', CURRENT_DATE) + INTERVAL '1 month'`)).rows[0].c;
   const vehiclesData = await getVehicles();
   const alerts = vehiclesData.map(v => {
     const items = [];

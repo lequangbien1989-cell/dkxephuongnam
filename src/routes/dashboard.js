@@ -8,7 +8,7 @@ router.get('/', async (req, res) => {
   // Stats
   const totalVehicles = (await query('SELECT COUNT(*) as c FROM vehicles WHERE is_active = 1')).rows[0].c;
   const activeDrivers = (await query('SELECT COUNT(*) as c FROM drivers WHERE is_active = 1')).rows[0].c;
-  const tripsThisMonth = (await query(`SELECT COUNT(*) as c FROM trips WHERE trip_date >= date_trunc('month', CURRENT_DATE)`)).rows[0].c;
+  const tripsThisMonth = (await query(`SELECT COUNT(*) as c FROM trips WHERE trip_date >= date_trunc('month', CURRENT_DATE) AND trip_date < date_trunc('month', CURRENT_DATE) + INTERVAL '1 month'`)).rows[0].c;
 
   // Expiry alerts
   const vResult = await query('SELECT * FROM vehicles WHERE is_active = 1');
