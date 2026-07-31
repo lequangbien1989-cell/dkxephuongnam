@@ -243,7 +243,13 @@ router.post('/:id', async (req, res) => {
 // Delete
 router.post('/:id/delete', async (req, res) => {
   await query('DELETE FROM trips WHERE id = $1', [req.params.id]);
-  res.redirect('/trips');
+  // Quay về trang xuất phát (dashboard nếu xoá từ đó)
+  const referer = req.get('Referer') || '';
+  if (referer.includes('/')) {
+    res.redirect('/');
+  } else {
+    res.redirect('/trips');
+  }
 });
 
 module.exports = router;

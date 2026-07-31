@@ -139,7 +139,7 @@
         <div class="table-responsive">
           <table class="table table-hover mb-0 small">
             <thead>
-              <tr><th>Ngày</th><th>Giờ</th><th>Xe</th><th>Tài xế</th><th>Nơi đến</th><th>Km</th></tr>
+              <tr><th>Ngày</th><th>Giờ</th><th>Xe</th><th>Tài xế</th><th>Nơi đến</th><th>Km</th><th></th></tr>
             </thead>
             <tbody>
               <% if (weekTrips.length === 0) { %>
@@ -161,6 +161,12 @@
                     <td><%= t.driver_name %></td>
                     <td><%= t.destination || '-' %></td>
                     <td><%= t.km_reading ? t.km_reading.toLocaleString() : '-' %></td>
+                    <td class="text-nowrap">
+                      <a href="/trips/<%= t.id %>/edit" class="btn btn-outline-secondary btn-sm py-0" title="Sửa chuyến"><i class="bi bi-pencil"></i></a>
+                      <form method="POST" action="/trips/<%= t.id %>/delete" class="d-inline" onsubmit="return confirm('Huỷ chuyến <%= t.trip_date %> của <%= t.driver_name %>?')">
+                        <button class="btn btn-outline-danger btn-sm py-0" title="Huỷ chuyến"><i class="bi bi-x-lg"></i></button>
+                      </form>
+                    </td>
                   </tr>
                 <% }); %>
               <% } %>
