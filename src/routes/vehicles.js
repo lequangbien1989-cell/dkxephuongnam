@@ -51,9 +51,21 @@ router.get('/:id/edit', async (req, res) => {
 // Update
 router.post('/:id', async (req, res) => {
   const { plate_number, phone, registration_expiry, insurance_expiry, body_insurance_expiry, maintenance_km, current_km, notes } = req.body;
+  // Lấy dữ liệu cũ để giữ lại các field không điền
+  const oldResult = await query('SELECT * FROM vehicles WHERE id = $1', [req.params.id]);
+  const old = oldResult.rows[0];
+  if (!old) return res.redirect('/vehicles');
   try {
     await query(`UPDATE vehicles SET plate_number=$1, phone=$2, registration_expiry=$3, insurance_expiry=$4, body_insurance_expiry=$5, maintenance_km=$6, current_km=$7, notes=$8, updated_at=NOW() WHERE id=$9`,
-      [plate_number, phone || null, registration_expiry || null, insurance_expiry || null, body_insurance_expiry || null, maintenance_km || null, current_km || 0, notes || null, req.params.id]);
+      [plate_number,
+        phone !== undefined && phone !== '' ? phone : old.phone,
+        registration_expiry || old.registration_expiry,
+        insurance_expiry || old.insurance_expiry,
+        body_insurance_expiry || old.body_insurance_expiry,
+        maintenance_km !== undefined && maintenance_km !== '' ? maintenance_km : old.maintenance_km,
+        current_km !== undefined && current_km !== '' ? current_km : old.current_km,
+        notes !== undefined ? notes : old.notes,
+        req.params.id]);
     res.redirect('/vehicles');
   } catch (e) {
     res.render('vehicles/form', { title: 'Sửa xe', vehicle: { ...req.body, id: req.params.id }, error: e.message });
