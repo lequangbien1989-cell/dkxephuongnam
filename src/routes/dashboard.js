@@ -32,6 +32,16 @@ router.get('/', async (req, res) => {
     .map(t => ({ ...t, trip_date: fmtDate(t.trip_date) }));
   const todayTrips = weekTrips.filter(t => t.trip_date === today);
 
+  // Color per vehicle (same palette as calendar)
+  const VEHICLE_COLORS = [
+    '#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c',
+    '#e67e22', '#34495e', '#16a085', '#c0392b', '#27ae60', '#8e44ad'
+  ];
+  const vehicleColors = {};
+  vehicles.forEach((v, i) => { vehicleColors[v.id] = VEHICLE_COLORS[i % VEHICLE_COLORS.length]; });
+  // Assign color to each week trip
+  weekTrips.forEach(t => { t.color = vehicleColors[t.vehicle_id] || '#999'; });
+
   // Driver list
   const drivers = (await query('SELECT name FROM drivers WHERE is_active = 1 ORDER BY name')).rows;
 

@@ -125,7 +125,10 @@
                       <% if (t.trip_date === today) { %><span class="badge badge-safe ms-1">Hôm nay</span><% } %>
                     </td>
                     <td><%= t.time_range || '-' %></td>
-                    <td class="fw-bold"><%= t.plate_number %></td>
+                    <td>
+                      <span class="vehicle-dot" style="background:<%= t.color || '#999' %>"></span>
+                      <span class="fw-bold" style="color:<%= t.color || '#333' %>"><%= t.plate_number %></span>
+                    </td>
                     <td><%= t.driver_name %></td>
                     <td><%= t.destination || '-' %></td>
                     <td><%= t.km_reading ? t.km_reading.toLocaleString() : '-' %></td>
