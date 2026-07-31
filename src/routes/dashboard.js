@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
   // Expiry alerts
   const vResult = await query('SELECT * FROM vehicles WHERE is_active = 1');
   const vehicles = vResult.rows;
-  const MAINT_WARNING_KM = 5000; // cảnh báo trước mốc bảo dưỡng 5000 km
+  const MAINT_WARNING_KM = 200; // cảnh báo trước mốc bảo dưỡng 200 km
   const alerts = vehicles.map(v => {
     const items = [];
     const daysReg = daysUntil(fmtDate(v.registration_expiry));
