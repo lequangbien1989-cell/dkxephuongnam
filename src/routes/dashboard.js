@@ -50,7 +50,7 @@ router.get('/', async (req, res) => {
     '#e67e22', '#34495e', '#16a085', '#c0392b', '#27ae60', '#8e44ad'
   ];
   const vehicleColors = {};
-  vehicles.forEach((v, i) => { vehicleColors[v.id] = VEHICLE_COLORS[i % VEHICLE_COLORS.length]; });
+  vehicles.forEach(v => { vehicleColors[v.id] = VEHICLE_COLORS[(v.id - 1) % VEHICLE_COLORS.length]; });
   // Assign color to each week trip AND each vehicle (alerts array)
   weekTrips.forEach(t => { t.color = vehicleColors[t.vehicle_id] || '#999'; });
   alerts.forEach(a => { a.color = vehicleColors[a.id] || '#999'; });
