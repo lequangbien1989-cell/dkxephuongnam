@@ -121,10 +121,12 @@ router.post('/', (req, res) => {
       const status = items.some(i => i.days <= 0) ? 'expired' : items.some(i => i.days <= 30) ? 'warning' : 'safe';
       return { ...v, items, status };
     });
-    const todayTrips = db.prepare(`SELECT t.*, v.plate_number FROM trips t JOIN vehicles v ON t.vehicle_id = v.id WHERE t.trip_date = ? ORDER BY t.created_at`).all(today);
+    const next7 = new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    const weekTrips = db.prepare(`SELECT t.*, v.plate_number FROM trips t JOIN vehicles v ON t.vehicle_id = v.id WHERE t.trip_date >= ? AND t.trip_date <= ? ORDER BY t.trip_date, t.created_at`).all(today, next7);
+    const todayTrips = weekTrips.filter(t => t.trip_date === today);
     return res.render('dashboard/index', {
       title: 'Tổng quan', totalVehicles, activeDrivers, tripsThisMonth,
-      alerts, todayTrips, today, vehicles: vehiclesData, drivers,
+      alerts, todayTrips, weekTrips, today, vehicles: vehiclesData, drivers,
       vehicle_id, conflict: msg
     });
   }
@@ -155,10 +157,12 @@ router.post('/', (req, res) => {
       const status = items.some(i => i.days <= 0) ? 'expired' : items.some(i => i.days <= 30) ? 'warning' : 'safe';
       return { ...v, items, status };
     });
-    const todayTrips = db.prepare(`SELECT t.*, v.plate_number FROM trips t JOIN vehicles v ON t.vehicle_id = v.id WHERE t.trip_date = ? ORDER BY t.created_at`).all(today);
+    const next7 = new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    const weekTrips = db.prepare(`SELECT t.*, v.plate_number FROM trips t JOIN vehicles v ON t.vehicle_id = v.id WHERE t.trip_date >= ? AND t.trip_date <= ? ORDER BY t.trip_date, t.created_at`).all(today, next7);
+    const todayTrips = weekTrips.filter(t => t.trip_date === today);
     return res.render('dashboard/index', {
       title: 'Tổng quan', totalVehicles, activeDrivers, tripsThisMonth,
-      alerts, todayTrips, today, vehicles: vehiclesData, drivers,
+      alerts, todayTrips, weekTrips, today, vehicles: vehiclesData, drivers,
       vehicle_id, conflict: msg
     });
   }
