@@ -104,26 +104,31 @@
   <div class="col-md-7">
     <div class="card">
       <div class="card-header d-flex justify-content-between align-items-center">
-        <span><i class="bi bi-calendar-day me-1"></i>Chuyến hôm nay (<%= fd(today) %>)</span>
+        <span><i class="bi bi-calendar-week me-1"></i>Chuyến 7 ngày tới</span>
         <a href="/trips" class="btn btn-outline-primary btn-sm">Xem tất cả</a>
       </div>
       <div class="card-body p-0">
         <div class="table-responsive">
           <table class="table table-hover mb-0 small">
             <thead>
-              <tr><th>Giờ</th><th>Xe</th><th>Tài xế</th><th>Nơi đến</th><th>Km</th></tr>
+              <tr><th>Ngày</th><th>Giờ</th><th>Xe</th><th>Tài xế</th><th>Nơi đến</th><th>Km</th></tr>
             </thead>
             <tbody>
-              <% if (todayTrips.length === 0) { %>
-                <tr><td colspan="5" class="text-muted text-center py-3">Chưa có chuyến nào hôm nay</td></tr>
+              <% if (weekTrips.length === 0) { %>
+                <tr><td colspan="6" class="text-muted text-center py-3">Chưa có chuyến nào trong 7 ngày tới</td></tr>
               <% } else { %>
-                <% todayTrips.forEach(t => { %>
-                  <tr>
+                <% var lastDate = ''; %>
+                <% weekTrips.forEach(t => { %>
+                  <tr class="<%= t.trip_date === today ? 'table-primary' : '' %>">
+                    <td class="text-nowrap">
+                      <%= fd(t.trip_date) %>
+                      <% if (t.trip_date === today) { %><span class="badge badge-safe ms-1">Hôm nay</span><% } %>
+                    </td>
                     <td><%= t.time_range || '-' %></td>
-                    <td><%= t.plate_number %></td>
+                    <td class="fw-bold"><%= t.plate_number %></td>
                     <td><%= t.driver_name %></td>
                     <td><%= t.destination || '-' %></td>
-                    <td><%= t.km_reading || '-' %></td>
+                    <td><%= t.km_reading ? t.km_reading.toLocaleString() : '-' %></td>
                   </tr>
                 <% }); %>
               <% } %>
