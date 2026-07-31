@@ -13,6 +13,7 @@ router.get('/', async (req, res) => {
   // Expiry alerts
   const vResult = await query('SELECT * FROM vehicles WHERE is_active = 1');
   const vehicles = vResult.rows;
+  const MAINT_WARNING_KM = 5000; // cảnh báo trước mốc bảo dưỡng 5000 km
   const alerts = vehicles.map(v => {
     const items = [];
     const daysReg = daysUntil(fmtDate(v.registration_expiry));
@@ -21,8 +22,19 @@ router.get('/', async (req, res) => {
     if (v.registration_expiry) items.push({ type: 'Đăng kiểm', date: fmtDate(v.registration_expiry), days: daysReg });
     if (v.insurance_expiry) items.push({ type: 'Bảo hiểm', date: fmtDate(v.insurance_expiry), days: daysIns });
     if (v.body_insurance_expiry) items.push({ type: 'BH Thân vỏ', date: fmtDate(v.body_insurance_expiry), days: daysBody });
-    const urgency = Math.min(...items.map(i => Math.abs(i.days)));
-    const status = items.some(i => i.days <= 0) ? 'expired' : items.some(i => i.days <= 30) ? 'warning' : 'safe';
+
+    // Cảnh báo km bảo dưỡng: current_km (km nhập gần nhất) sắp tới mốc maintenance_km
+    if (v.maintenance_km && v.current_km) {
+      const remaining = v.maintenance_km - v.current_km;
+      if (remaining <= 0) {
+        items.push({ type: 'KM bảo dưỡng', date: 'Đã quá mốc ' + v.maintenance_km.toLocaleString() + ' km', days: -1, kmAlert: true, remaining });
+      } else if (remaining <= MAINT_WARNING_KM) {
+        items.push({ type: 'KM bảo dưỡng', date: 'Còn ' + remaining.toLocaleString() + ' km nữa', days: 1, kmAlert: true, remaining });
+      }
+    }
+
+    const urgency = items.length ? Math.min(...items.map(i => Math.abs(i.days))) : 0;
+    const status = items.some(i => i.days <= 0) ? 'expired' : items.some(i => i.days <= 30 || i.kmAlert) ? 'warning' : 'safe';
     return { ...v, items, status, urgency };
   });
 

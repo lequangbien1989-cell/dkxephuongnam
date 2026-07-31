@@ -30,12 +30,19 @@
           <div class="col-md-4">
             <div class="border rounded p-3 <%= _v.status==='expired'?'border-danger':'border-warning' %>">
               <div class="fw-bold"><%= _v.plate_number %></div>
-              <% for (var _ii=0;_ii<_v.items.length;_ii++){var _i=_v.items[_ii];if(_i.days>30){continue;} %>
-                <div class="small mt-1">
-                  <span class="badge <%= _i.days<=0?'badge-expired':'badge-warning' %>"><%= _i.days<=0?'Hết hạn':'Sắp hết hạn' %></span>
-                  <%= _i.type %>: <strong><%= fd(_i.date) %></strong>
-                  <% if (_i.days>0) { %><span class="text-muted">(còn <%= _i.days %> ngày)</span><% } %>
-                </div>
+              <% for (var _ii=0;_ii<_v.items.length;_ii++){var _i=_v.items[_ii];if(_i.days>30 && !_i.kmAlert){continue;} %>
+                <% if (_i.kmAlert) { %>
+                  <div class="small mt-1">
+                    <span class="badge <%= _i.days<=0?'badge-expired':'badge-warning' %>"><%= _i.days<=0?'Quá mốc':'Sắp tới' %></span>
+                    <%= _i.type %>: <strong><%= _i.date %></strong>
+                  </div>
+                <% } else { %>
+                  <div class="small mt-1">
+                    <span class="badge <%= _i.days<=0?'badge-expired':'badge-warning' %>"><%= _i.days<=0?'Hết hạn':'Sắp hết hạn' %></span>
+                    <%= _i.type %>: <strong><%= fd(_i.date) %></strong>
+                    <% if (_i.days>0) { %><span class="text-muted">(còn <%= _i.days %> ngày)</span><% } %>
+                  </div>
+                <% } %>
               <% } %>
             </div>
           </div>
