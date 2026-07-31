@@ -14,7 +14,6 @@ module.exports = app;
 getDb();
 seed();
 
-const app = express();
 
 // Config
 app.use(express.urlencoded({ extended: true }));
