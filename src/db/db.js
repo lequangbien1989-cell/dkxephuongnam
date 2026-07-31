@@ -9,6 +9,7 @@ function getPool() {
     }
     pool = new Pool({
       connectionString: process.env.DATABASE_URL,
+      connectionTimeoutMillis: 20000,
       // SSL: Supabase/Render need it; local doesn't. Auto-detect.
       ssl: process.env.DATABASE_URL.includes('localhost') || process.env.DATABASE_URL.includes('/var/run')
         ? undefined

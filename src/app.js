@@ -7,17 +7,12 @@ const { seed } = require('./db/seed');
 // 1. Khởi tạo Express app
 const app = express();
 
-// 2. Init DB + seed (async, run on startup)
-(async () => {
-  try {
-    await initSchema();
-    await seed();
-    console.log('✅ Database sẵn sàng');
-  } catch (e) {
-    console.error('❌ Không kết nối được database:', e.message);
-    console.error('   Kiểm tra DATABASE_URL trong .env');
-  }
-})();
+// 2. Init DB + seed (run before server starts)
+async function initDb() {
+  await initSchema();
+  await seed();
+  console.log('✅ Database sẵn sàng');
+}
 
 // 3. Config Middlewares & Public folder
 app.use(express.urlencoded({ extended: true }));
@@ -70,3 +65,4 @@ app.use((req, res) => {
 });
 
 module.exports = app;
+module.exports.initDb = initDb;
