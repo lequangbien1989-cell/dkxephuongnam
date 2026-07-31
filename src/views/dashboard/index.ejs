@@ -155,7 +155,7 @@
                     <td><%= t.time_range || '-' %></td>
                     <td>
                       <% var _vi = vi(t.vehicle_type); %>
-                      <img src="<%= _vi.img %>" alt="<%= _vi.label %>" title="<%= _vi.label %>" class="brand-logo" style="background:<%= t.color || '#333' %>">
+                      <img src="<%= _vi.img %>" alt="<%= _vi.label %>" title="<%= _vi.label %>" class="brand-logo">
                       <span class="fw-bold" style="color:<%= t.color || '#333' %>"><%= t.plate_number %></span>
                     </td>
                     <td><%= t.driver_name %></td>
@@ -189,7 +189,7 @@
             <tr>
               <td>
                 <% var _vi2 = vi(v.vehicle_type); %>
-                <img src="<%= _vi2.img %>" alt="<%= _vi2.label %>" title="<%= _vi2.label %>" class="brand-logo" style="background:<%= v.color || '#333' %>">
+                <img src="<%= _vi2.img %>" alt="<%= _vi2.label %>" title="<%= _vi2.label %>" class="brand-logo">
                 <span class="fw-bold" style="color:<%= v.color || '#333' %>"><%= v.plate_number %></span>
               </td>
               <td>
