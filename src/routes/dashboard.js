@@ -26,8 +26,10 @@ router.get('/', (req, res) => {
     return { ...v, items, status, urgency };
   });
 
-  // Today's trips
-  const todayTrips = db.prepare(`SELECT t.*, v.plate_number FROM trips t JOIN vehicles v ON t.vehicle_id = v.id WHERE t.trip_date = ? ORDER BY t.created_at`).all(today);
+  // Next 7 days trips (today + 6 upcoming days)
+  const next7 = new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const weekTrips = db.prepare(`SELECT t.*, v.plate_number FROM trips t JOIN vehicles v ON t.vehicle_id = v.id WHERE t.trip_date >= ? AND t.trip_date <= ? ORDER BY t.trip_date, t.created_at`).all(today, next7);
+  const todayTrips = weekTrips.filter(t => t.trip_date === today);
 
   // Driver list for datalist
   const drivers = db.prepare('SELECT name FROM drivers WHERE is_active = 1 ORDER BY name').all();
@@ -35,7 +37,7 @@ router.get('/', (req, res) => {
   res.render('dashboard/index', {
     title: 'Tổng quan',
     totalVehicles, activeDrivers, tripsThisMonth,
-    alerts, todayTrips, today, vehicles, drivers,
+    alerts, todayTrips, weekTrips, today, vehicles, drivers,
     daysUntil
   });
 });
