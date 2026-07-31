@@ -1,47 +1,43 @@
 const express = require('express');
 const router = express.Router();
-const { getDb } = require('../db/database');
+const { query } = require('../db/db');
 
-router.get('/', (req, res) => {
-  const db = getDb();
-  const drivers = db.prepare('SELECT * FROM drivers WHERE is_active = 1 ORDER BY name').all();
-  res.render('drivers/index', { title: 'Danh sách tài xế', drivers });
+router.get('/', async (req, res) => {
+  const result = await query('SELECT * FROM drivers WHERE is_active = 1 ORDER BY name');
+  res.render('drivers/index', { title: 'Danh sách tài xế', drivers: result.rows });
 });
 
 router.get('/new', (req, res) => {
   res.render('drivers/form', { title: 'Thêm tài xế', driver: {} });
 });
 
-router.post('/', (req, res) => {
-  const db = getDb();
+router.post('/', async (req, res) => {
   try {
-    db.prepare('INSERT INTO drivers (name, phone) VALUES (?, ?)').run(req.body.name, req.body.phone || null);
+    await query('INSERT INTO drivers (name, phone) VALUES ($1, $2)', [req.body.name, req.body.phone || null]);
     res.redirect('/drivers');
   } catch (e) {
     res.render('drivers/form', { title: 'Thêm tài xế', driver: req.body, error: e.message });
   }
 });
 
-router.get('/:id/edit', (req, res) => {
-  const db = getDb();
-  const driver = db.prepare('SELECT * FROM drivers WHERE id = ?').get(req.params.id);
+router.get('/:id/edit', async (req, res) => {
+  const result = await query('SELECT * FROM drivers WHERE id = $1', [req.params.id]);
+  const driver = result.rows[0];
   if (!driver) return res.redirect('/drivers');
   res.render('drivers/form', { title: 'Sửa - ' + driver.name, driver });
 });
 
-router.post('/:id', (req, res) => {
-  const db = getDb();
+router.post('/:id', async (req, res) => {
   try {
-    db.prepare('UPDATE drivers SET name=?, phone=? WHERE id=?').run(req.body.name, req.body.phone || null, req.params.id);
+    await query('UPDATE drivers SET name=$1, phone=$2 WHERE id=$3', [req.body.name, req.body.phone || null, req.params.id]);
     res.redirect('/drivers');
   } catch (e) {
     res.render('drivers/form', { title: 'Sửa tài xế', driver: { ...req.body, id: req.params.id }, error: e.message });
   }
 });
 
-router.post('/:id/delete', (req, res) => {
-  const db = getDb();
-  db.prepare('DELETE FROM drivers WHERE id = ?').run(req.params.id);
+router.post('/:id/delete', async (req, res) => {
+  await query('DELETE FROM drivers WHERE id = $1', [req.params.id]);
   res.redirect('/drivers');
 });
 

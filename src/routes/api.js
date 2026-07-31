@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getDb } = require('../db/database');
+const { query } = require('../db/db');
 
 // Color palette for vehicles
 const VEHICLE_COLORS = [
@@ -8,21 +8,30 @@ const VEHICLE_COLORS = [
   '#e67e22', '#34495e', '#16a085', '#c0392b', '#27ae60', '#8e44ad'
 ];
 
-router.get('/calendar', (req, res) => {
-  const db = getDb();
+// Normalize pg date (Date object) -> 'YYYY-MM-DD' string
+function fmtDate(d) {
+  if (!d) return null;
+  if (d instanceof Date) {
+    return d.toISOString().slice(0, 10);
+  }
+  return String(d).slice(0, 10);
+}
+
+router.get('/calendar', async (req, res) => {
   const month = req.query.month || new Date().toISOString().slice(0, 7);
   const startDate = month + '-01';
-  // Calculate end of month
   const [y, m] = month.split('-').map(Number);
   const endDay = new Date(y, m, 0).getDate();
   const endDate = month + '-' + String(endDay).padStart(2, '0');
 
-  const trips = db.prepare(
+  const tripsResult = await query(
     `SELECT t.*, v.plate_number FROM trips t
      JOIN vehicles v ON t.vehicle_id = v.id
-     WHERE t.trip_date >= ? AND t.trip_date <= ?
-     ORDER BY t.trip_date, t.time_range`
-  ).all(startDate, endDate);
+     WHERE t.trip_date >= $1 AND t.trip_date <= $2
+     ORDER BY t.trip_date, t.time_range`, [startDate, endDate]);
+
+  // Normalize dates
+  const trips = tripsResult.rows.map(t => ({ ...t, trip_date: fmtDate(t.trip_date) }));
 
   // Group by day
   const days = {};
@@ -32,21 +41,25 @@ router.get('/calendar', (req, res) => {
   }
 
   // Vehicle list with colors
-  const vehicles = db.prepare('SELECT * FROM vehicles WHERE is_active = 1 ORDER BY plate_number').all();
+  const vResult = await query('SELECT * FROM vehicles WHERE is_active = 1 ORDER BY plate_number');
+  const vehicles = vResult.rows.map(v => ({ ...v, color: VEHICLE_COLORS[(v.id - 1) % VEHICLE_COLORS.length] }));
   const vehicleMap = {};
-  vehicles.forEach((v, i) => {
-    v.color = VEHICLE_COLORS[i % VEHICLE_COLORS.length];
-    vehicleMap[v.plate_number] = v.color;
-  });
+  vehicles.forEach(v => { vehicleMap[v.plate_number] = v.color; });
 
   res.json({ month, startDate, endDate, days, vehicles, vehicleMap, endDay });
 });
 
-router.get('/alerts', (req, res) => {
-  const db = getDb();
-  const vehicles = db.prepare('SELECT * FROM vehicles WHERE is_active = 1').all();
+router.get('/alerts', async (req, res) => {
+  const vResult = await query('SELECT * FROM vehicles WHERE is_active = 1');
+  const vehicles = vResult.rows;
   const today = new Date().toISOString().slice(0, 10);
   const in30Days = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
+  vehicles.forEach(v => {
+    v.registration_expiry = fmtDate(v.registration_expiry);
+    v.insurance_expiry = fmtDate(v.insurance_expiry);
+    v.body_insurance_expiry = fmtDate(v.body_insurance_expiry);
+  });
 
   const expiring = vehicles.filter(v =>
     (v.registration_expiry && v.registration_expiry <= in30Days && v.registration_expiry >= today) ||
@@ -62,11 +75,10 @@ router.get('/alerts', (req, res) => {
   res.json({ expiring, expired });
 });
 
-router.get('/stats', (req, res) => {
-  const db = getDb();
-  const totalVehicles = db.prepare('SELECT COUNT(*) as c FROM vehicles WHERE is_active = 1').get().c;
-  const activeDrivers = db.prepare('SELECT COUNT(*) as c FROM drivers WHERE is_active = 1').get().c;
-  const tripsThisMonth = db.prepare("SELECT COUNT(*) as c FROM trips WHERE trip_date >= date('now','start of month')").get().c;
+router.get('/stats', async (req, res) => {
+  const totalVehicles = (await query('SELECT COUNT(*) as c FROM vehicles WHERE is_active = 1')).rows[0].c;
+  const activeDrivers = (await query('SELECT COUNT(*) as c FROM drivers WHERE is_active = 1')).rows[0].c;
+  const tripsThisMonth = (await query(`SELECT COUNT(*) as c FROM trips WHERE trip_date >= date_trunc('month', CURRENT_DATE)`)).rows[0].c;
   res.json({ totalVehicles, activeDrivers, tripsThisMonth });
 });
 

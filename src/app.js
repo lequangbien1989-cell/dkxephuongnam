@@ -1,15 +1,23 @@
 const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
 const path = require('path');
-const { getDb } = require('./db/database');
+const { initSchema } = require('./db/db');
 const { seed } = require('./db/seed');
 
 // 1. Khởi tạo Express app
 const app = express();
 
-// 2. Init DB + seed
-getDb();
-seed();
+// 2. Init DB + seed (async, run on startup)
+(async () => {
+  try {
+    await initSchema();
+    await seed();
+    console.log('✅ Database sẵn sàng');
+  } catch (e) {
+    console.error('❌ Không kết nối được database:', e.message);
+    console.error('   Kiểm tra DATABASE_URL trong .env');
+  }
+})();
 
 // 3. Config Middlewares & Public folder
 app.use(express.urlencoded({ extended: true }));
@@ -22,16 +30,21 @@ app.use(expressLayouts);
 app.set('layout', 'layouts/main');
 
 // Helper functions for views
-function formatDate(dateStr) {
-  if (!dateStr) return '';
+function toDateStr(v) {
+  if (!v) return '';
+  if (v instanceof Date) return v.toISOString().slice(0, 10);
+  return String(v).slice(0, 10);
+}
+function formatDate(v) {
+  if (!v) return '';
+  const dateStr = toDateStr(v);
   const parts = dateStr.split('-');
   if (parts.length !== 3) return dateStr;
   return parts[2] + '/' + parts[1] + '/' + parts[0];
 }
-
-function daysUntil(dateStr) {
-  if (!dateStr) return Infinity;
-  return Math.ceil((new Date(dateStr) - new Date()) / (1000 * 60 * 60 * 24));
+function daysUntil(v) {
+  if (!v) return Infinity;
+  return Math.ceil((new Date(toDateStr(v)) - new Date()) / (1000 * 60 * 60 * 24));
 }
 
 // Middleware: make helpers available to all views
@@ -51,10 +64,9 @@ app.use('/maintenances', require('./routes/maintenances'));
 app.use('/company', require('./routes/company'));
 app.use('/api', require('./routes/api'));
 
-// 6. 404 Handler
+// 6. 404
 app.use((req, res) => {
   res.status(404).render('404', { title: 'Không tìm thấy' });
 });
 
-// 7. BẮT BUỘC NẰM Ở DÒNG CUỐI CÙNG CỦA FILE:
 module.exports = app;
