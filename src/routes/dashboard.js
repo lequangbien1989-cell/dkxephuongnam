@@ -51,8 +51,9 @@ router.get('/', async (req, res) => {
   ];
   const vehicleColors = {};
   vehicles.forEach((v, i) => { vehicleColors[v.id] = VEHICLE_COLORS[i % VEHICLE_COLORS.length]; });
-  // Assign color to each week trip
+  // Assign color to each week trip AND each vehicle (alerts array)
   weekTrips.forEach(t => { t.color = vehicleColors[t.vehicle_id] || '#999'; });
+  alerts.forEach(a => { a.color = vehicleColors[a.id] || '#999'; });
 
   // Driver list
   const drivers = (await query('SELECT name FROM drivers WHERE is_active = 1 ORDER BY name')).rows;

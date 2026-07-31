@@ -186,7 +186,10 @@
         <tbody>
           <% alerts.forEach(v => { %>
             <tr>
-              <td class="fw-bold"><%= v.plate_number %></td>
+              <td>
+                <span class="vehicle-dot" style="background:<%= v.color || '#999' %>"></span>
+                <span class="fw-bold" style="color:<%= v.color || '#333' %>"><%= v.plate_number %></span>
+              </td>
               <td>
                 <% if (v.registration_expiry) { var d = du(v.registration_expiry); var cls = d<=0?'badge-expired':d<=30?'badge-warning':'badge-safe'; %>
                   <span class="badge <%= cls %>"><%= fd(v.registration_expiry) %></span>
