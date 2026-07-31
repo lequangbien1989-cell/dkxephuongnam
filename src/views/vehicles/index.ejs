@@ -8,7 +8,7 @@
     <div class="table-responsive">
       <table class="table table-hover mb-0 small">
         <thead>
-          <tr><th>Biển số</th><th>Điện thoại</th><th>Đăng kiểm</th><th>Bảo hiểm</th><th>BH Thân vỏ</th><th>KM bảo dưỡng</th><th>Ghi chú</th><th></th></tr>
+          <tr><th>Biển số</th><th>Điện thoại</th><th>Đăng kiểm</th><th>Bảo hiểm</th><th>BH Thân vỏ</th><th>KM hiện tại</th><th>KM bảo dưỡng</th><th>Ghi chú</th><th></th></tr>
         </thead>
         <tbody>
           <% vehicles.forEach(v => { %>
@@ -30,6 +30,7 @@
                   <span class="badge <%= cls %>"><%= fd(v.body_insurance_expiry) %></span>
                 <% } else { %>--<% } %>
               </td>
+              <td><%= v.current_km ? v.current_km.toLocaleString() + ' km' : '--' %></td>
               <td><%= v.maintenance_km ? v.maintenance_km.toLocaleString() + ' km' : '--' %></td>
               <td class="text-truncate" style="max-width:150px"><%= v.notes || '' %></td>
               <td class="text-nowrap">
