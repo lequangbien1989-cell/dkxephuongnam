@@ -4,22 +4,18 @@ const path = require('path');
 const { getDb } = require('./db/database');
 const { seed } = require('./db/seed');
 
-// Chỉ dùng 1 dòng khai báo 'app' này duy nhất:
+// 1. Khởi tạo Express app
 const app = express();
 
-// ... các cấu hình app.use(), app.set() khác ...
-
-module.exports = app;
-// Init DB + seed
+// 2. Init DB + seed
 getDb();
 seed();
 
-
-// Config
+// 3. Config Middlewares & Public folder
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
-// View engine
+// 4. View engine (EJS)
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(expressLayouts);
@@ -32,6 +28,7 @@ function formatDate(dateStr) {
   if (parts.length !== 3) return dateStr;
   return parts[2] + '/' + parts[1] + '/' + parts[0];
 }
+
 function daysUntil(dateStr) {
   if (!dateStr) return Infinity;
   return Math.ceil((new Date(dateStr) - new Date()) / (1000 * 60 * 60 * 24));
@@ -45,7 +42,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Routes
+// 5. Routes
 app.use('/', require('./routes/dashboard'));
 app.use('/vehicles', require('./routes/vehicles'));
 app.use('/drivers', require('./routes/drivers'));
@@ -54,9 +51,10 @@ app.use('/maintenances', require('./routes/maintenances'));
 app.use('/company', require('./routes/company'));
 app.use('/api', require('./routes/api'));
 
-// 404
+// 6. 404 Handler
 app.use((req, res) => {
   res.status(404).render('404', { title: 'Không tìm thấy' });
 });
 
+// 7. BẮT BUỘC NẰM Ở DÒNG CUỐI CÙNG CỦA FILE:
 module.exports = app;
