@@ -30,7 +30,7 @@
           <div class="col-md-4">
             <div class="border rounded p-3 <%= _v.status==='expired'?'border-danger':'border-warning' %>">
               <div class="fw-bold"><%= _v.plate_number %></div>
-              <% for (var _ii=0;_ii<_v.items.length;_ii++){var _i=_v.items[_ii];if(_i.days>30 && !_i.kmAlert){continue;} %>
+              <% for (var _ii=0;_ii<_v.items.length;_ii++){var _i=_v.items[_ii];if(_i.days>15 && !_i.kmAlert){continue;} %>
                 <% if (_i.kmAlert) { %>
                   <div class="small mt-1">
                     <span class="badge <%= _i.days<=0?'badge-expired':'badge-warning' %>"><%= _i.days<=0?'Quá mốc':'Sắp tới' %></span>
@@ -193,17 +193,17 @@
                 <span class="fw-bold" style="color:<%= v.color || '#333' %>"><%= v.plate_number %></span>
               </td>
               <td>
-                <% if (v.registration_expiry) { var d = du(v.registration_expiry); var cls = d<=0?'badge-expired':d<=30?'badge-warning':'badge-safe'; %>
+                <% if (v.registration_expiry) { var d = du(v.registration_expiry); var cls = d<=0?'badge-expired':d<=15?'badge-warning':'badge-safe'; %>
                   <span class="badge <%= cls %>"><%= fd(v.registration_expiry) %></span>
                 <% } else { %><span class="text-muted">--</span><% } %>
               </td>
               <td>
-                <% if (v.insurance_expiry) { var d = du(v.insurance_expiry); var cls = d<=0?'badge-expired':d<=30?'badge-warning':'badge-safe'; %>
+                <% if (v.insurance_expiry) { var d = du(v.insurance_expiry); var cls = d<=0?'badge-expired':d<=15?'badge-warning':'badge-safe'; %>
                   <span class="badge <%= cls %>"><%= fd(v.insurance_expiry) %></span>
                 <% } else { %><span class="text-muted">--</span><% } %>
               </td>
               <td>
-                <% if (v.body_insurance_expiry) { var d = du(v.body_insurance_expiry); var cls = d<=0?'badge-expired':d<=30?'badge-warning':'badge-safe'; %>
+                <% if (v.body_insurance_expiry) { var d = du(v.body_insurance_expiry); var cls = d<=0?'badge-expired':d<=15?'badge-warning':'badge-safe'; %>
                   <span class="badge <%= cls %>"><%= fd(v.body_insurance_expiry) %></span>
                 <% } else { %><span class="text-muted">--</span><% } %>
               </td>

@@ -115,7 +115,7 @@ async function renderDashboard(res, vehicle_id, conflict) {
     if (v.registration_expiry) items.push({ type: 'Đăng kiểm', date: fmtDate(v.registration_expiry), days: Math.ceil((new Date(fmtDate(v.registration_expiry)) - new Date()) / (1000 * 60 * 60 * 24)) });
     if (v.insurance_expiry) items.push({ type: 'Bảo hiểm', date: fmtDate(v.insurance_expiry), days: Math.ceil((new Date(fmtDate(v.insurance_expiry)) - new Date()) / (1000 * 60 * 60 * 24)) });
     if (v.body_insurance_expiry) items.push({ type: 'BH Thân vỏ', date: fmtDate(v.body_insurance_expiry), days: Math.ceil((new Date(fmtDate(v.body_insurance_expiry)) - new Date()) / (1000 * 60 * 60 * 24)) });
-    const status = items.some(i => i.days <= 0) ? 'expired' : items.some(i => i.days <= 30) ? 'warning' : 'safe';
+    const status = items.some(i => i.days <= 0) ? 'expired' : items.some(i => i.days <= 15) ? 'warning' : 'safe';
     return { ...v, items, status };
   });
   const next7 = new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);

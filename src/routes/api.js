@@ -53,7 +53,7 @@ router.get('/alerts', async (req, res) => {
   const vResult = await query('SELECT * FROM vehicles WHERE is_active = 1');
   const vehicles = vResult.rows;
   const today = new Date().toISOString().slice(0, 10);
-  const in30Days = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const in30Days = new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
   vehicles.forEach(v => {
     v.registration_expiry = fmtDate(v.registration_expiry);

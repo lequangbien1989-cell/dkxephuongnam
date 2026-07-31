@@ -16,17 +16,17 @@
               <td class="fw-bold"><% var _vi4 = vi(v.vehicle_type); %><img src="<%= _vi4.img %>" alt="<%= _vi4.label %>" title="<%= _vi4.label %>" class="brand-logo"> <a href="/vehicles/<%= v.id %>"><%= v.plate_number %></a></td>
               <td><%= v.phone || '-' %></td>
               <td>
-                <% if (v.registration_expiry) { var d = du(v.registration_expiry); var cls = d<=0?'badge-expired':d<=30?'badge-warning':'badge-safe'; %>
+                <% if (v.registration_expiry) { var d = du(v.registration_expiry); var cls = d<=0?'badge-expired':d<=15?'badge-warning':'badge-safe'; %>
                   <span class="badge <%= cls %>"><%= fd(v.registration_expiry) %></span>
                 <% } else { %>--<% } %>
               </td>
               <td>
-                <% if (v.insurance_expiry) { var d = du(v.insurance_expiry); var cls = d<=0?'badge-expired':d<=30?'badge-warning':'badge-safe'; %>
+                <% if (v.insurance_expiry) { var d = du(v.insurance_expiry); var cls = d<=0?'badge-expired':d<=15?'badge-warning':'badge-safe'; %>
                   <span class="badge <%= cls %>"><%= fd(v.insurance_expiry) %></span>
                 <% } else { %>--<% } %>
               </td>
               <td>
-                <% if (v.body_insurance_expiry) { var d = du(v.body_insurance_expiry); var cls = d<=0?'badge-expired':d<=30?'badge-warning':'badge-safe'; %>
+                <% if (v.body_insurance_expiry) { var d = du(v.body_insurance_expiry); var cls = d<=0?'badge-expired':d<=15?'badge-warning':'badge-safe'; %>
                   <span class="badge <%= cls %>"><%= fd(v.body_insurance_expiry) %></span>
                 <% } else { %>--<% } %>
               </td>

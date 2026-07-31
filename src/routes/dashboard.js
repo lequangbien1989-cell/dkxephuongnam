@@ -34,7 +34,7 @@ router.get('/', async (req, res) => {
     }
 
     const urgency = items.length ? Math.min(...items.map(i => Math.abs(i.days))) : 0;
-    const status = items.some(i => i.days <= 0) ? 'expired' : items.some(i => i.days <= 30 || i.kmAlert) ? 'warning' : 'safe';
+    const status = items.some(i => i.days <= 0) ? 'expired' : items.some(i => i.days <= 15 || i.kmAlert) ? 'warning' : 'safe';
     return { ...v, items, status, urgency };
   });
 
