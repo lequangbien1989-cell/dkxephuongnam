@@ -16,7 +16,8 @@ async function seed() {
       '52X-6133': 'Toyota'
     };
     for (const v of vResult.rows) {
-      if (!v.vehicle_type && typeByPlate[v.plate_number]) {
+      // Luôn cập nhật type đúng theo biển số (kể cả khi đã có giá trị mặc định)
+      if (typeByPlate[v.plate_number]) {
         await query(`UPDATE vehicles SET vehicle_type=$1 WHERE id=$2`, [typeByPlate[v.plate_number], v.id]);
       }
     }
