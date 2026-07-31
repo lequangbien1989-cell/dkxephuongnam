@@ -74,6 +74,21 @@
     document.querySelectorAll('.sidebar .nav-link').forEach(a => {
       if (a.getAttribute('href') === window.location.pathname) a.classList.add('active');
     });
+
+    // Check phạt nguội: copy biển số vào clipboard rồi mở trang tra cứu
+    function checkPhatNguoi(plate) {
+      const clean = plate.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+      // Copy biển số vào clipboard
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(clean).then(() => {
+          alert('📋 Đã copy biển số ' + clean + ' — dán vào ô tra cứu trên trang phạt nguội (Ctrl+V)');
+        });
+      } else {
+        alert('Biển số: ' + clean + ' — dán vào ô tra cứu trên trang phạt nguội');
+      }
+      // Mở trang tra cứu
+      window.open('https://phatnguoi.com/', '_blank');
+    }
   </script>
 </body>
 </html>
