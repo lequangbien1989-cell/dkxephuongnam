@@ -41,12 +41,12 @@ function daysUntil(v) {
   if (!v) return Infinity;
   return Math.ceil((new Date(toDateStr(v)) - new Date()) / (1000 * 60 * 60 * 24));
 }
-// Biểu tượng xe theo loại (icon + label)
+// Biểu tượng xe theo loại (logo SVG thật của hãng)
 function vehicleIcon(type) {
   const t = (type || 'Khác').toLowerCase();
-  if (t.includes('vin')) return { icon: '⚡', label: 'VinFast' };
-  if (t.includes('mitsu')) return { icon: '🚙', label: 'Mitsubishi' };
-  return { icon: '🚗', label: 'Toyota' };
+  if (t.includes('vin')) return { img: '/brands/vinfast.svg', label: 'VinFast' };
+  if (t.includes('mitsu')) return { img: '/brands/mitsubishi.svg', label: 'Mitsubishi' };
+  return { img: '/brands/toyota.svg', label: 'Toyota' };
 }
 
 // Middleware: make helpers available to all views

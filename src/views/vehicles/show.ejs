@@ -6,7 +6,7 @@
       <div class="card-header">Thông tin xe</div>
       <div class="card-body">
         <table class="table table-sm mb-0 small">
-          <tr><th style="width:140px">Biển số</th><td><% var _vi3 = vi(vehicle.vehicle_type); %><%= _vi3.icon %> <%= vehicle.plate_number %> <span class="badge badge-safe ms-1"><%= _vi3.label %></span></td></tr>
+          <tr><th style="width:140px">Biển số</th><td><% var _vi3 = vi(vehicle.vehicle_type); %><img src="<%= _vi3.img %>" alt="<%= _vi3.label %>" title="<%= _vi3.label %>" class="brand-logo"> <%= vehicle.plate_number %> <span class="badge badge-safe ms-1"><%= _vi3.label %></span></td></tr>
           <tr><th>Điện thoại</th><td><%= vehicle.phone || '-' %></td></tr>
           <tr><th>Đăng kiểm</th><td><%= fd(vehicle.registration_expiry) || '-' %></td></tr>
           <tr><th>Bảo hiểm</th><td><%= fd(vehicle.insurance_expiry) || '-' %></td></tr>
