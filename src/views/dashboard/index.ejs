@@ -188,7 +188,7 @@
     <div class="table-responsive">
       <table class="table table-hover mb-0 small">
         <thead>
-          <tr><th>Biển số</th><th>Đăng kiểm</th><th>Bảo hiểm</th><th>BH Thân vỏ</th><th>KM hiện tại</th><th>KM bảo dưỡng</th><th></th></tr>
+          <tr><th>Biển số</th><th>Đăng kiểm</th><th>Bảo hiểm</th><th>BH Thân vỏ</th><th>KM hiện tại</th><th>KM bảo dưỡng</th></tr>
         </thead>
         <tbody>
           <% alerts.forEach(v => { %>
@@ -215,9 +215,6 @@
               </td>
               <td><%= v.current_km ? v.current_km.toLocaleString() + ' km' : '--' %></td>
               <td><%= v.maintenance_km ? v.maintenance_km.toLocaleString() + ' km' : '--' %></td>
-              <td>
-                <button type="button" onclick="checkPhatNguoi('<%= v.plate_number %>')" title="Tra phạt nguội <%= v.plate_number %>" class="btn btn-outline-danger btn-sm py-0"><i class="bi bi-shield-exclamation me-1"></i>Check phạt nguội</button>
-              </td>
             </tr>
           <% }); %>
         </tbody>
