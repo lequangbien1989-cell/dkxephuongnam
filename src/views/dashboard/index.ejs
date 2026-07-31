@@ -54,7 +54,7 @@
         <% if (typeof conflict !== 'undefined' && conflict) { %>
           <div class="alert alert-warning py-2 small"><%= conflict %></div>
         <% } %>
-        <form method="POST" action="/trips">
+        <form method="POST" action="/trips" id="quickAddForm">
           <div class="mb-2">
             <label class="form-label small">Ngày</label>
             <input type="date" name="trip_date" class="form-control form-control-sm" value="<%= today %>" required>
@@ -80,12 +80,33 @@
           <div class="row g-1 mb-2">
             <div class="col-6">
               <label class="form-label small">Khung giờ</label>
-              <select name="time_range" class="form-select form-select-sm">
+              <select name="time_range" class="form-select form-select-sm" id="quickTimeRange" onchange="quickToggleCustom()">
                 <option value="">-- Chọn giờ --</option>
                 <option value="7h-17h">7h - 17h (Cả ngày)</option>
                 <option value="7h-12h">7h - 12h (Sáng)</option>
                 <option value="12h-17h">12h - 17h (Chiều)</option>
+                <option value="CUSTOM">✏️ Tuỳ chỉnh...</option>
               </select>
+              <input name="time_range_custom" class="form-control form-control-sm mt-1" id="quickTimeCustom" placeholder="VD: 6h30-9h30" style="display:none">
+              <script>
+                function quickToggleCustom() {
+                  const sel = document.getElementById('quickTimeRange');
+                  const custom = document.getElementById('quickTimeCustom');
+                  if (sel.value === 'CUSTOM') {
+                    custom.style.display = '';
+                    custom.required = true;
+                    custom.focus();
+                  } else {
+                    custom.style.display = 'none';
+                    custom.required = false;
+                  }
+                }
+                document.querySelector('#quickAddForm')?.addEventListener('submit', function() {
+                  const sel = document.getElementById('quickTimeRange');
+                  const custom = document.getElementById('quickTimeCustom');
+                  if (sel.value === 'CUSTOM') sel.value = custom.value || 'CUSTOM';
+                });
+              </script>
             </div>
             <div class="col-6">
               <label class="form-label small">Nơi đến</label>

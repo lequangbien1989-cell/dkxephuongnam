@@ -133,7 +133,9 @@ async function renderDashboard(res, vehicle_id, conflict) {
 // Create
 router.post('/', async (req, res) => {
   const db = { query };
-  const { trip_date, vehicle_id, driver_name, time_range, destination, km_reading, notes } = req.body;
+  const { trip_date, vehicle_id, driver_name, time_range, time_range_custom, destination, km_reading, notes } = req.body;
+  // Nếu chọn "Tuỳ chỉnh" thì dùng giờ người dùng nhập
+  const finalTimeRange = (time_range === 'CUSTOM' ? time_range_custom : time_range) || null;
 
   // Check vehicle expired
   const vResult = await query('SELECT * FROM vehicles WHERE id = $1', [vehicle_id]);
@@ -167,7 +169,7 @@ router.post('/', async (req, res) => {
 
   try {
     await query(`INSERT INTO trips (trip_date, vehicle_id, driver_name, time_range, destination, km_reading, notes) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-      [trip_date, vehicle_id, driver_name, time_range || null, destination || null, km_reading || null, notes || null]);
+      [trip_date, vehicle_id, driver_name, finalTimeRange, destination || null, km_reading || null, notes || null]);
 
     if (km_reading) {
       await query(`UPDATE vehicles SET current_km = GREATEST(COALESCE(current_km,0), $1), updated_at = NOW() WHERE id = $2`, [km_reading, vehicle_id]);
@@ -200,7 +202,9 @@ router.get('/:id/edit', async (req, res) => {
 
 // Update
 router.post('/:id', async (req, res) => {
-  const { trip_date, vehicle_id, driver_name, time_range, destination, km_reading, notes } = req.body;
+  const { trip_date, vehicle_id, driver_name, time_range, time_range_custom, destination, km_reading, notes } = req.body;
+  // Nếu chọn "Tuỳ chỉnh" thì dùng giờ người dùng nhập
+  const finalTimeRange = (time_range === 'CUSTOM' ? time_range_custom : time_range) || null;
 
   // Check vehicle expired
   const vResult = await query('SELECT * FROM vehicles WHERE id = $1', [vehicle_id]);
@@ -215,7 +219,7 @@ router.post('/:id', async (req, res) => {
   }
 
   // Check conflict (exclude current trip)
-  const conflict = await findConflict(trip_date, vehicle_id, time_range, req.params.id);
+  const conflict = await findConflict(trip_date, vehicle_id, finalTimeRange, req.params.id);
   if (conflict) {
     const trip = { ...req.body, id: req.params.id };
     const vehicles = await getVehicles();
@@ -226,7 +230,7 @@ router.post('/:id', async (req, res) => {
 
   try {
     await query(`UPDATE trips SET trip_date=$1, vehicle_id=$2, driver_name=$3, time_range=$4, destination=$5, km_reading=$6, notes=$7, updated_at=NOW() WHERE id=$8`,
-      [trip_date, vehicle_id, driver_name, time_range || null, destination || null, km_reading || null, notes || null, req.params.id]);
+      [trip_date, vehicle_id, driver_name, finalTimeRange, destination || null, km_reading || null, notes || null, req.params.id]);
     if (km_reading) {
       await query(`UPDATE vehicles SET current_km = GREATEST(COALESCE(current_km,0), $1), updated_at = NOW() WHERE id = $2`, [km_reading, vehicle_id]);
     }
