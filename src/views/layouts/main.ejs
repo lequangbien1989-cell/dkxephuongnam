@@ -26,6 +26,7 @@
     .stat-card .label { color: #7f8c8d; font-size: .85rem; }
     .vehicle-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
     .brand-logo { width: 18px; height: 18px; margin-right: 5px; vertical-align: middle; object-fit: contain; }
+    .header-logo { width: 26px; height: 26px; object-fit: contain; }
     .table th { background: #f8f9fa; white-space: nowrap; }
     .page-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 16px; }
     .btn-sm { font-size: .8rem; }
@@ -57,7 +58,10 @@
 
   <!-- Top navbar -->
   <div class="navbar-top">
-    <span class="fw-semibold"><%= typeof title !== 'undefined' ? title : 'Tổng quan' %></span>
+    <span class="d-flex align-items-center gap-2 fw-semibold">
+      <img src="/logo.png" alt="Phương Nam" class="header-logo">
+      <span><%= typeof title !== 'undefined' ? title : 'Tổng quan' %></span>
+    </span>
     <div></div>
   </div>
 
