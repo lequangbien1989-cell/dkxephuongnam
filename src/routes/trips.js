@@ -43,6 +43,15 @@ function toMinutes(t) {
   return null;
 }
 
+// "7-9" / "7:30-9:45" → "7h-9h" / "7h30-9h45". Nhập xong có sẵn h.
+function normalizeTimeRange(str) {
+  if (!str) return str;
+  const m = str.match(/^(\d{1,2})(?::(\d{2}))?\s*-\s*(\d{1,2})(?::(\d{2}))?$/);
+  if (!m) return str;
+  const fmt = (h, mm) => (mm ? h + 'h' + mm : h + 'h');
+  return fmt(m[1], m[2]) + '-' + fmt(m[3], m[4]);
+}
+
 // Helper: check if vehicle has valid registration & insurance for a given date
 function isVehicleExpired(vehicle, tripDate) {
   if (!vehicle) return 'Xe không tồn tại';
@@ -134,8 +143,8 @@ async function renderDashboard(res, vehicle_id, conflict) {
 router.post('/', async (req, res) => {
   const db = { query };
   const { trip_date, vehicle_id, driver_name, time_range, time_range_custom, destination, km_reading, notes } = req.body;
-  // Nếu chọn "Tuỳ chỉnh" thì dùng giờ người dùng nhập
-  const finalTimeRange = (time_range === 'CUSTOM' ? time_range_custom : time_range) || null;
+  // Nếu chọn "Tuỳ chỉnh" thì dùng giờ người dùng nhập, chuẩn hoá "7-9" → "7h-9h"
+  const finalTimeRange = normalizeTimeRange(time_range === 'CUSTOM' ? time_range_custom : time_range) || null;
 
   // Check vehicle expired
   const vResult = await query('SELECT * FROM vehicles WHERE id = $1', [vehicle_id]);
@@ -203,8 +212,8 @@ router.get('/:id/edit', async (req, res) => {
 // Update
 router.post('/:id', async (req, res) => {
   const { trip_date, vehicle_id, driver_name, time_range, time_range_custom, destination, km_reading, notes } = req.body;
-  // Nếu chọn "Tuỳ chỉnh" thì dùng giờ người dùng nhập
-  const finalTimeRange = (time_range === 'CUSTOM' ? time_range_custom : time_range) || null;
+  // Nếu chọn "Tuỳ chỉnh" thì dùng giờ người dùng nhập, chuẩn hoá "7-9" → "7h-9h"
+  const finalTimeRange = normalizeTimeRange(time_range === 'CUSTOM' ? time_range_custom : time_range) || null;
 
   // Check vehicle expired
   const vResult = await query('SELECT * FROM vehicles WHERE id = $1', [vehicle_id]);
