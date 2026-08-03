@@ -38,8 +38,13 @@ function parseTimeRange(str) {
 
 function toMinutes(t) {
   const parts = t.split(':');
-  if (parts.length === 1 && parts[0].length <= 2) return parseInt(parts[0]) * 60;
   if (parts.length === 2) return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+  if (parts.length === 1) {
+    // "7" → 7h, "630" → 6h30, "1230" → 12h30
+    if (parts[0].length <= 2) return parseInt(parts[0]) * 60;
+    if (parts[0].length === 3) return parseInt(parts[0][0]) * 60 + parseInt(parts[0].slice(1));
+    if (parts[0].length === 4) return parseInt(parts[0].slice(0, 2)) * 60 + parseInt(parts[0].slice(2));
+  }
   return null;
 }
 

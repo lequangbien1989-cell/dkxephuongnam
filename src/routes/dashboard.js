@@ -44,13 +44,17 @@ router.get('/', async (req, res) => {
     .map(t => ({ ...t, trip_date: fmtDate(t.trip_date) }));
   const todayTrips = weekTrips.filter(t => t.trip_date === today);
 
-  // Xe trống hôm nay: active, ko có chuyến ngày hôm nay
-  const freeVehicles = (await query(`
-    SELECT v.id, v.plate_number, v.vehicle_type
-    FROM vehicles v
-    WHERE v.is_active = 1
-      AND NOT EXISTS (SELECT 1 FROM trips t WHERE t.vehicle_id = v.id AND t.trip_date = $1)
-    ORDER BY v.plate_number`, [today])).rows;
+  // Xe trống hiện tại: active, mọi chuyến hôm nay đã kết thúc (hoặc ko có chuyến)
+  const nowMin = new Date().getHours() * 60 + new Date().getMinutes();
+  const busyToday = new Set();
+  const todayTripsAll = (await query('SELECT vehicle_id, time_range FROM trips WHERE trip_date = $1', [today])).rows;
+  for (const t of todayTripsAll) {
+    const tr = timeToRange(t.time_range);
+    // Chưa rõ giờ hoặc chuyến chưa xong (cả chuyến qua đêm end<=start) → xe bận
+    if (!tr || tr.end <= tr.start || tr.end > nowMin) busyToday.add(t.vehicle_id);
+  }
+  const freeVehicles = (await query('SELECT id, plate_number, vehicle_type FROM vehicles WHERE is_active = 1 ORDER BY plate_number')).rows
+    .filter(v => !busyToday.has(v.id));
 
   // Color per vehicle (same palette as calendar)
   const VEHICLE_COLORS = [
@@ -78,6 +82,29 @@ router.get('/', async (req, res) => {
     daysUntil, fmtDate, fineCheckUrl
   });
 });
+
+// "7h-9h" / "7-9" / "6h30-9h45" → {start,end} minutes. Invalid → null
+function timeToRange(str) {
+  if (!str) return null;
+  const clean = str.replace(/[hH]/g, '').replace(/\s/g, '');
+  const parts = clean.split('-');
+  if (parts.length !== 2) return null;
+  const s = toMin(parts[0]);
+  const e = toMin(parts[1]);
+  if (s == null || e == null) return null;
+  return { start: s, end: e };
+}
+function toMin(t) {
+  const parts = t.split(':');
+  if (parts.length === 2) return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+  if (parts.length === 1) {
+    // "7" → 7h, "630" → 6h30, "1230" → 12h30
+    if (parts[0].length <= 2) return parseInt(parts[0]) * 60;
+    if (parts[0].length === 3) return parseInt(parts[0][0]) * 60 + parseInt(parts[0].slice(1));
+    if (parts[0].length === 4) return parseInt(parts[0].slice(0, 2)) * 60 + parseInt(parts[0].slice(2));
+  }
+  return null;
+}
 
 function fmtDate(d) {
   if (!d) return null;
