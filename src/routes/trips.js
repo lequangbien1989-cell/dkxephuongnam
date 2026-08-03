@@ -107,7 +107,12 @@ router.get('/', async (req, res) => {
   sql += ` ORDER BY t.trip_date DESC, t.created_at DESC LIMIT 200`;
 
   const tripsResult = await query(sql, params);
-  const trips = tripsResult.rows.map(t => ({ ...t, trip_date: fmtDate(t.trip_date) }));
+  // Màu xe theo id, giống dashboard (VEHICLE_COLORS[(id-1) % len])
+  const VEHICLE_COLORS = [
+    '#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c',
+    '#e67e22', '#34495e', '#16a085', '#c0392b', '#27ae60', '#8e44ad'
+  ];
+  const trips = tripsResult.rows.map(t => ({ ...t, trip_date: fmtDate(t.trip_date), color: VEHICLE_COLORS[(t.vehicle_id - 1) % VEHICLE_COLORS.length] }));
   const vehicles = await getVehicles();
   const drivers = (await query('SELECT DISTINCT driver_name FROM trips ORDER BY driver_name')).rows;
 

@@ -64,7 +64,7 @@
                 <% trips.forEach(t => { %>
                   <tr>
                     <td><%= fd(t.trip_date) %></td>
-                    <td class="fw-bold"><%= t.plate_number %></td>
+                    <td class="fw-bold" style="color:<%= t.color || '#333' %>"><%= t.plate_number %></td>
                     <td><%= t.driver_name %></td>
                     <td><%= t.time_range || '-' %></td>
                     <td><%= t.destination || '-' %></td>
@@ -233,7 +233,7 @@ const calendar = {
       body = trips.map(t =>
         '<div class="day-trip-row">' +
           '<span class="color-dot" style="background:'+(this.vehicleColors[t.plate_number]||'#999')+'"></span>' +
-          '<div class="fw-bold" style="min-width:80px">'+t.plate_number+'</div>' +
+          '<div class="fw-bold" style="min-width:80px;color:'+(this.vehicleColors[t.plate_number]||'#333')+'">'+t.plate_number+'</div>' +
           '<div style="min-width:70px">'+(t.time_range||'-')+'</div>' +
           '<div style="min-width:70px">'+t.driver_name+'</div>' +
           '<div style="min-width:80px">'+(t.destination||'-')+'</div>' +
