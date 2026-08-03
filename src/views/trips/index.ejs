@@ -71,9 +71,6 @@
                     <td><%= t.km_reading ? t.km_reading.toLocaleString() : '-' %></td>
                     <td class="text-nowrap">
                       <a href="/trips/<%= t.id %>/edit" class="btn btn-outline-secondary btn-sm py-0"><i class="bi bi-pencil"></i></a>
-                      <form method="POST" action="/trips/<%= t.id %>/delete" class="d-inline" onsubmit="return confirm('Xoá chuyến ngày <%= t.trip_date %>?')">
-                        <button class="btn btn-outline-danger btn-sm py-0"><i class="bi bi-trash"></i></button>
-                      </form>
                     </td>
                   </tr>
                 <% }); %>
@@ -245,9 +242,6 @@ const calendar = {
           '<div class="text-muted">'+(t.km_reading ? t.km_reading.toLocaleString()+' km' : '')+'</div>' +
           '<div class="ms-auto text-nowrap">' +
             '<a href="/trips/'+t.id+'/edit" class="btn btn-outline-secondary btn-sm py-0"><i class="bi bi-pencil"></i></a>' +
-            '<form method="POST" action="/trips/'+t.id+'/delete" class="d-inline" onsubmit="return confirm(\'Xoá chuyến?\')">' +
-              '<button class="btn btn-outline-danger btn-sm py-0 ms-1"><i class="bi bi-trash"></i></button>' +
-            '</form>' +
           '</div>' +
         '</div>'
       ).join('');
