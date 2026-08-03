@@ -146,9 +146,20 @@ async function renderDashboard(res, vehicle_id, conflict) {
     .map(t => ({ ...t, trip_date: fmtDate(t.trip_date) }));
   const todayTrips = weekTrips.filter(t => t.trip_date === today);
   const drivers = await getDrivers();
+
+  // Xe trống hiện tại: active, mọi chuyến hôm nay đã kết thúc (giống dashboard route)
+  const nowMin = new Date().getHours() * 60 + new Date().getMinutes();
+  const busyToday = new Set();
+  const todayTripsAll = (await query('SELECT vehicle_id, time_range FROM trips WHERE trip_date = $1', [today])).rows;
+  for (const t of todayTripsAll) {
+    const tr = parseTimeRange(t.time_range);
+    if (!tr || tr.end <= tr.start || tr.end > nowMin) busyToday.add(t.vehicle_id);
+  }
+  const freeVehicles = vehiclesData.filter(v => !busyToday.has(v.id));
+
   res.render('dashboard/index', {
     title: 'Tổng quan', totalVehicles, activeDrivers, tripsThisMonth,
-    alerts, todayTrips, weekTrips, today, vehicles: vehiclesData, drivers,
+    alerts, todayTrips, weekTrips, today, vehicles: vehiclesData, drivers, freeVehicles,
     vehicle_id, conflict
   });
 }
