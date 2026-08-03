@@ -14,7 +14,7 @@
     .sidebar .nav-link:hover, .sidebar .nav-link.active { color: #fff; background: #34495e; }
     .sidebar .nav-link i { margin-right: 8px; width: 20px; text-align: center; }
     .wrapper { margin-left: 220px; min-height: 100vh; }
-    .navbar-top { height: 56px; background: #fff; border-bottom: 1px solid #dee2e6; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; }
+    .navbar-top { position: relative; height: 56px; background: #fff; border-bottom: 1px solid #dee2e6; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; }
     .main-content { padding: 20px 24px; }
     .card { border: none; box-shadow: 0 1px 3px rgba(0,0,0,.08); margin-bottom: 16px; }
     .card-header { background: #fff; border-bottom: 1px solid #eee; font-weight: 600; padding: 12px 20px; }
@@ -27,6 +27,7 @@
     .vehicle-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
     .brand-logo { width: 18px; height: 18px; margin-right: 5px; vertical-align: middle; object-fit: contain; }
     .header-logo { width: 26px; height: 26px; object-fit: contain; }
+    .header-logo-center { position: absolute; left: 50%; transform: translateX(-50%); height: 32px; width: auto; object-fit: contain; }
     .table th { background: #f8f9fa; white-space: nowrap; }
     .page-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 16px; }
     .btn-sm { font-size: .8rem; }
@@ -58,10 +59,8 @@
 
   <!-- Top navbar -->
   <div class="navbar-top">
-    <span class="d-flex align-items-center gap-2 fw-semibold">
-      <img src="/logo.png" alt="Phương Nam" class="header-logo">
-      <span><%= typeof title !== 'undefined' ? title : 'Tổng quan' %></span>
-    </span>
+    <span class="fw-semibold"><%= typeof title !== 'undefined' ? title : 'Tổng quan' %></span>
+    <img src="/logo.png" alt="Phương Nam" class="header-logo-center">
     <div></div>
   </div>
 
