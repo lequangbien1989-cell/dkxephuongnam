@@ -167,7 +167,8 @@ const calendar = {
     const daysInMonth = data.endDay;
     const prevMonthDays = new Date(y, m-1, 0).getDate();
 
-    const todayStr = new Date().toISOString().slice(0,10);
+    const now = new Date();
+    const todayStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
     const dowNames = ['CN','T2','T3','T4','T5','T6','T7'];
 
     let html = '';

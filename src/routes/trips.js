@@ -60,7 +60,7 @@ function normalizeTimeRange(str) {
 // Helper: check if vehicle has valid registration & insurance for a given date
 function isVehicleExpired(vehicle, tripDate) {
   if (!vehicle) return 'Xe không tồn tại';
-  const d = tripDate || new Date().toISOString().slice(0, 10);
+  const d = tripDate || todayStr();
   if (vehicle.registration_expiry && fmtDate(vehicle.registration_expiry) < d) {
     return 'hết hạn đăng kiểm (' + fmtDate(vehicle.registration_expiry) + ')';
   }
@@ -72,8 +72,17 @@ function isVehicleExpired(vehicle, tripDate) {
 
 function fmtDate(d) {
   if (!d) return null;
-  if (d instanceof Date) return d.toISOString().slice(0, 10);
+  if (d instanceof Date) {
+    // Giờ địa phương, ko dùng toISOString (UTC) — tránh lệch ngày (UTC+7)
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return y + '-' + m + '-' + day;
+  }
   return String(d).slice(0, 10);
+}
+function todayStr() {
+  return fmtDate(new Date());
 }
 
 async function getVehicles() {
@@ -113,13 +122,13 @@ router.get('/', async (req, res) => {
 router.get('/new', async (req, res) => {
   const vehicles = await getVehicles();
   const drivers = await getDrivers();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayStr();
   res.render('trips/form', { title: 'Thêm chuyến', trip: {}, vehicles, drivers, today, conflict: null });
 });
 
 // Helper: render dashboard (used for conflict/expired errors from dashboard form)
 async function renderDashboard(res, vehicle_id, conflict) {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayStr();
   const totalVehicles = (await query('SELECT COUNT(*) as c FROM vehicles WHERE is_active = 1')).rows[0].c;
   const activeDrivers = (await query('SELECT COUNT(*) as c FROM drivers WHERE is_active = 1')).rows[0].c;
   const tripsThisMonth = (await query(`SELECT COUNT(*) as c FROM trips WHERE trip_date >= date_trunc('month', CURRENT_DATE) AND trip_date < date_trunc('month', CURRENT_DATE) + INTERVAL '1 month'`)).rows[0].c;
@@ -132,7 +141,7 @@ async function renderDashboard(res, vehicle_id, conflict) {
     const status = items.some(i => i.days <= 0) ? 'expired' : items.some(i => i.days <= 15) ? 'warning' : 'safe';
     return { ...v, items, status };
   });
-  const next7 = new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const next7 = fmtDate(new Date(Date.now() + 6 * 24 * 60 * 60 * 1000));
   const weekTrips = (await query(`SELECT t.*, v.plate_number FROM trips t JOIN vehicles v ON t.vehicle_id = v.id WHERE t.trip_date >= $1 AND t.trip_date <= $2 ORDER BY t.trip_date, t.created_at`, [today, next7])).rows
     .map(t => ({ ...t, trip_date: fmtDate(t.trip_date) }));
   const todayTrips = weekTrips.filter(t => t.trip_date === today);
@@ -158,7 +167,7 @@ router.post('/', async (req, res) => {
   if (expiredMsg) {
     const vehicles = await getVehicles();
     const drivers = await getDrivers();
-    const today = new Date().toISOString().slice(0, 10);
+    const today = todayStr();
     const msg = `🚫 Xe ${vehicle.plate_number} ${expiredMsg} — không thể đăng ký chuyến!`;
     const referer = req.get('Referer') || '';
     if (referer.includes('/trips/new')) {
@@ -172,7 +181,7 @@ router.post('/', async (req, res) => {
   if (conflict) {
     const vehicles = await getVehicles();
     const drivers = await getDrivers();
-    const today = new Date().toISOString().slice(0, 10);
+    const today = todayStr();
     const msg = `⚠️ Xe ${vehicle.plate_number} đã có chuyến của ${conflict.with} (${conflict.time}) vào ngày này — giờ bị trùng!`;
     const referer = req.get('Referer') || '';
     if (referer.includes('/trips/new')) {
@@ -198,7 +207,7 @@ router.post('/', async (req, res) => {
   } catch (e) {
     const vehicles = await getVehicles();
     const drivers = await getDrivers();
-    const today = new Date().toISOString().slice(0, 10);
+    const today = todayStr();
     res.render('trips/form', { title: 'Thêm chuyến', trip: req.body, vehicles, drivers, today, error: e.message, conflict: null });
   }
 });

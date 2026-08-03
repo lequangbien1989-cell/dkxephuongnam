@@ -21,7 +21,7 @@ router.get('/', async (req, res) => {
 router.get('/new', async (req, res) => {
   const vResult = await query('SELECT * FROM vehicles WHERE is_active = 1 ORDER BY plate_number');
   const dResult = await query('SELECT name FROM drivers WHERE is_active = 1 ORDER BY name');
-  const today = new Date().toISOString().slice(0, 10);
+  const today = res.locals.todayStr();
   res.render('maintenances/form', { title: 'Thêm bảo dưỡng', maint: {}, vehicles: vResult.rows, drivers: dResult.rows, today });
 });
 
@@ -35,7 +35,7 @@ router.post('/', async (req, res) => {
   } catch (e) {
     const vResult = await query('SELECT * FROM vehicles WHERE is_active = 1 ORDER BY plate_number');
     const dResult = await query('SELECT name FROM drivers WHERE is_active = 1 ORDER BY name');
-    const today = new Date().toISOString().slice(0, 10);
+    const today = res.locals.todayStr();
     res.render('maintenances/form', { title: 'Thêm bảo dưỡng', maint: req.body, vehicles: vResult.rows, drivers: dResult.rows, today, error: e.message });
   }
 });

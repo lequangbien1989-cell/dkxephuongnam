@@ -27,8 +27,17 @@ app.set('layout', 'layouts/main');
 // Helper functions for views
 function toDateStr(v) {
   if (!v) return '';
-  if (v instanceof Date) return v.toISOString().slice(0, 10);
+  if (v instanceof Date) {
+    // Giờ địa phương, ko dùng toISOString (UTC) — tránh lệch ngày (UTC+7)
+    const y = v.getFullYear();
+    const m = String(v.getMonth() + 1).padStart(2, '0');
+    const d = String(v.getDate()).padStart(2, '0');
+    return y + '-' + m + '-' + d;
+  }
   return String(v).slice(0, 10);
+}
+function todayStr() {
+  return toDateStr(new Date());
 }
 function formatDate(v) {
   if (!v) return '';
@@ -55,6 +64,7 @@ app.use((req, res, next) => {
   res.locals.fd = formatDate;
   res.locals.du = daysUntil;
   res.locals.vi = vehicleIcon;
+  res.locals.todayStr = todayStr;
   next();
 });
 

@@ -3,7 +3,7 @@ const router = express.Router();
 const { query } = require('../db/db');
 
 router.get('/', async (req, res) => {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = fmtDate(new Date());
 
   // Stats
   const totalVehicles = (await query('SELECT COUNT(*) as c FROM vehicles WHERE is_active = 1')).rows[0].c;
@@ -39,7 +39,7 @@ router.get('/', async (req, res) => {
   });
 
   // Next 7 days trips (today + 6 upcoming days)
-  const next7 = new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const next7 = fmtDate(new Date(Date.now() + 6 * 24 * 60 * 60 * 1000));
   const weekTrips = (await query(`SELECT t.*, v.plate_number, v.vehicle_type FROM trips t JOIN vehicles v ON t.vehicle_id = v.id WHERE t.trip_date >= $1 AND t.trip_date <= $2 ORDER BY t.trip_date, t.created_at`, [today, next7])).rows
     .map(t => ({ ...t, trip_date: fmtDate(t.trip_date) }));
   const todayTrips = weekTrips.filter(t => t.trip_date === today);
@@ -108,7 +108,13 @@ function toMin(t) {
 
 function fmtDate(d) {
   if (!d) return null;
-  if (d instanceof Date) return d.toISOString().slice(0, 10);
+  if (d instanceof Date) {
+    // Dùng giờ địa phương, ko dùng toISOString (UTC) để tránh lệch ngày
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return y + '-' + m + '-' + day;
+  }
   return String(d).slice(0, 10);
 }
 

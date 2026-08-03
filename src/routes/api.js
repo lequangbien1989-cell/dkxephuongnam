@@ -8,17 +8,21 @@ const VEHICLE_COLORS = [
   '#e67e22', '#34495e', '#16a085', '#c0392b', '#27ae60', '#8e44ad'
 ];
 
-// Normalize pg date (Date object) -> 'YYYY-MM-DD' string
+// Normalize pg date (Date object) -> 'YYYY-MM-DD' string (giờ địa phương, tránh lệch ngày UTC+7)
 function fmtDate(d) {
   if (!d) return null;
   if (d instanceof Date) {
-    return d.toISOString().slice(0, 10);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return y + '-' + m + '-' + day;
   }
   return String(d).slice(0, 10);
 }
+function todayStr() { return fmtDate(new Date()); }
 
 router.get('/calendar', async (req, res) => {
-  const month = req.query.month || new Date().toISOString().slice(0, 7);
+  const month = req.query.month || todayStr().slice(0, 7);
   const startDate = month + '-01';
   const [y, m] = month.split('-').map(Number);
   const endDay = new Date(y, m, 0).getDate();
@@ -52,8 +56,8 @@ router.get('/calendar', async (req, res) => {
 router.get('/alerts', async (req, res) => {
   const vResult = await query('SELECT * FROM vehicles WHERE is_active = 1');
   const vehicles = vResult.rows;
-  const today = new Date().toISOString().slice(0, 10);
-  const in30Days = new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const today = todayStr();
+  const in30Days = fmtDate(new Date(Date.now() + 15 * 24 * 60 * 60 * 1000));
 
   vehicles.forEach(v => {
     v.registration_expiry = fmtDate(v.registration_expiry);
