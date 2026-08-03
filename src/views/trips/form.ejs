@@ -34,13 +34,7 @@
         </div>
         <div class="col-md-3">
           <label class="form-label small">Khung giờ <span class="text-danger">*</span></label>
-          <select name="time_range" class="form-select form-select-sm">
-            <option value="">-- Chọn giờ --</option>
-            <option value="7h-17h" <%= trip.time_range === '7h-17h' ? 'selected' : '' %>>7h - 17h (Cả ngày)</option>
-            <option value="7h-12h" <%= trip.time_range === '7h-12h' ? 'selected' : '' %>>7h - 12h (Sáng)</option>
-            <option value="12h-17h" <%= trip.time_range === '12h-17h' ? 'selected' : '' %>>12h - 17h (Chiều)</option>
-          </select>
-          <input name="time_range_custom" class="form-control form-control-sm mt-1" placeholder="Hoặc gõ giờ: VD 7-9, 6h30-9h30" value="<%= trip.time_range && !['7h-17h','7h-12h','12h-17h'].includes(trip.time_range) ? trip.time_range : '' %>">
+          <input name="time_range_custom" class="form-control form-control-sm" placeholder="VD: 7-9, 6h30-9h30" value="<%= trip.time_range && !['7h-17h','7h-12h','12h-17h'].includes(trip.time_range) ? trip.time_range : '' %>" required>
         </div>
       </div>
       <div class="row g-2 mb-2">
