@@ -143,8 +143,8 @@ async function renderDashboard(res, vehicle_id, conflict) {
 router.post('/', async (req, res) => {
   const db = { query };
   const { trip_date, vehicle_id, driver_name, time_range, time_range_custom, destination, km_reading, notes } = req.body;
-  // Nếu chọn "Tuỳ chỉnh" thì dùng giờ người dùng nhập, chuẩn hoá "7-9" → "7h-9h"
-  const finalTimeRange = normalizeTimeRange(time_range === 'CUSTOM' ? time_range_custom : time_range) || null;
+  // Giờ: ưu tiên ô tuỳ chỉnh nếu nhập, còn ko dùng khung chọn. Chuẩn hoá "7-9" → "7h-9h"
+  const finalTimeRange = normalizeTimeRange(time_range_custom || time_range) || null;
 
   // Check vehicle expired
   const vResult = await query('SELECT * FROM vehicles WHERE id = $1', [vehicle_id]);
@@ -212,8 +212,8 @@ router.get('/:id/edit', async (req, res) => {
 // Update
 router.post('/:id', async (req, res) => {
   const { trip_date, vehicle_id, driver_name, time_range, time_range_custom, destination, km_reading, notes } = req.body;
-  // Nếu chọn "Tuỳ chỉnh" thì dùng giờ người dùng nhập, chuẩn hoá "7-9" → "7h-9h"
-  const finalTimeRange = normalizeTimeRange(time_range === 'CUSTOM' ? time_range_custom : time_range) || null;
+  // Giờ: ưu tiên ô tuỳ chỉnh nếu nhập, còn ko dùng khung chọn. Chuẩn hoá "7-9" → "7h-9h"
+  const finalTimeRange = normalizeTimeRange(time_range_custom || time_range) || null;
 
   // Check vehicle expired
   const vResult = await query('SELECT * FROM vehicles WHERE id = $1', [vehicle_id]);
