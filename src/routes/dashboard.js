@@ -45,7 +45,9 @@ router.get('/', async (req, res) => {
   const todayTrips = weekTrips.filter(t => t.trip_date === today);
 
   // Xe trống hiện tại: active, mọi chuyến hôm nay đã kết thúc (hoặc ko có chuyến)
-  const nowMin = new Date().getHours() * 60 + new Date().getMinutes();
+  // Dùng giờ Việt Nam (UTC+7) — server Render chạy UTC
+  const nowVN = new Date(new Date().getTime() + 7 * 60 * 60 * 1000);
+  const nowMin = nowVN.getUTCHours() * 60 + nowVN.getUTCMinutes();
   const busyToday = new Set();
   const todayTripsAll = (await query('SELECT vehicle_id, time_range FROM trips WHERE trip_date = $1', [today])).rows;
   for (const t of todayTripsAll) {

@@ -148,7 +148,9 @@ async function renderDashboard(res, vehicle_id, conflict) {
   const drivers = await getDrivers();
 
   // Xe trống hiện tại: active, mọi chuyến hôm nay đã kết thúc (giống dashboard route)
-  const nowMin = new Date().getHours() * 60 + new Date().getMinutes();
+  // Dùng giờ Việt Nam (UTC+7) — server Render chạy UTC
+  const nowVN = new Date(new Date().getTime() + 7 * 60 * 60 * 1000);
+  const nowMin = nowVN.getUTCHours() * 60 + nowVN.getUTCMinutes();
   const busyToday = new Set();
   const todayTripsAll = (await query('SELECT vehicle_id, time_range FROM trips WHERE trip_date = $1', [today])).rows;
   for (const t of todayTripsAll) {
