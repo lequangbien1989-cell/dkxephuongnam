@@ -44,6 +44,14 @@ router.get('/', async (req, res) => {
     .map(t => ({ ...t, trip_date: fmtDate(t.trip_date) }));
   const todayTrips = weekTrips.filter(t => t.trip_date === today);
 
+  // Xe trống hôm nay: active, ko có chuyến ngày hôm nay
+  const freeVehicles = (await query(`
+    SELECT v.id, v.plate_number, v.vehicle_type
+    FROM vehicles v
+    WHERE v.is_active = 1
+      AND NOT EXISTS (SELECT 1 FROM trips t WHERE t.vehicle_id = v.id AND t.trip_date = $1)
+    ORDER BY v.plate_number`, [today])).rows;
+
   // Color per vehicle (same palette as calendar)
   const VEHICLE_COLORS = [
     '#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c',
@@ -54,6 +62,7 @@ router.get('/', async (req, res) => {
   // Assign color to each week trip AND each vehicle (alerts array)
   weekTrips.forEach(t => { t.color = vehicleColors[t.vehicle_id] || '#999'; });
   alerts.forEach(a => { a.color = vehicleColors[a.id] || '#999'; });
+  freeVehicles.forEach(v => { v.color = vehicleColors[v.id] || '#999'; });
 
   // Driver list
   const drivers = (await query('SELECT name FROM drivers WHERE is_active = 1 ORDER BY name')).rows;
@@ -65,7 +74,7 @@ router.get('/', async (req, res) => {
   res.render('dashboard/index', {
     title: 'Tổng quan',
     totalVehicles, activeDrivers, tripsThisMonth,
-    alerts, todayTrips, weekTrips, today, vehicles, drivers,
+    alerts, todayTrips, weekTrips, today, vehicles, drivers, freeVehicles,
     daysUntil, fmtDate, fineCheckUrl
   });
 });

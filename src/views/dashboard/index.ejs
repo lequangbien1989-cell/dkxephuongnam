@@ -104,6 +104,22 @@
     </div>
   </div>
   <div class="col-md-7">
+    <div class="card mb-3">
+      <div class="card-header"><i class="bi bi-check2-circle text-success me-1"></i>Xe trống hôm nay</div>
+      <div class="card-body py-2">
+        <% if (freeVehicles.length === 0) { %>
+          <span class="text-muted small">Không có xe trống hôm nay</span>
+        <% } else { %>
+          <% freeVehicles.forEach(v => { %>
+            <% var _fv = vi(v.vehicle_type); %>
+            <span class="d-inline-flex align-items-center border rounded px-2 py-1 me-1 mb-1 small">
+              <img src="<%= _fv.img %>" alt="<%= _fv.label %>" title="<%= _fv.label %>" class="brand-logo">
+              <span class="fw-bold" style="color:<%= v.color %>"><%= v.plate_number %></span>
+            </span>
+          <% }); %>
+        <% } %>
+      </div>
+    </div>
     <div class="card">
       <div class="card-header d-flex justify-content-between align-items-center">
         <span><i class="bi bi-calendar-week me-1"></i>Chuyến 7 ngày tới</span>
