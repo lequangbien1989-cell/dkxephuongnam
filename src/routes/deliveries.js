@@ -26,7 +26,9 @@ function normalizeTimeRange(str) {
 async function formData() {
   const vehicles = (await query('SELECT * FROM vehicles WHERE is_active = 1 ORDER BY plate_number')).rows;
   const drivers = (await query('SELECT name FROM drivers WHERE is_active = 1 ORDER BY name')).rows;
-  return { vehicles, drivers, statuses: STATUSES };
+  const admins = (await query(`SELECT name FROM staff_contacts WHERE is_active = 1 AND role = 'Admin' ORDER BY name`)).rows;
+  const salesStaff = (await query(`SELECT name FROM staff_contacts WHERE is_active = 1 AND role = 'NVKD' ORDER BY name`)).rows;
+  return { vehicles, drivers, admins, salesStaff, statuses: STATUSES };
 }
 
 function bodyToDelivery(body, id) {

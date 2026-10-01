@@ -120,6 +120,19 @@ async function initSchema() {
     CREATE INDEX IF NOT EXISTS idx_delivery_plans_status ON delivery_plans(status);
     CREATE INDEX IF NOT EXISTS idx_delivery_plans_vehicle ON delivery_plans(vehicle_id);
 
+    CREATE TABLE IF NOT EXISTS staff_contacts (
+      id         SERIAL PRIMARY KEY,
+      role       TEXT NOT NULL CHECK (role IN ('Admin', 'NVKD')),
+      name       TEXT NOT NULL,
+      phone      TEXT,
+      is_active  INTEGER NOT NULL DEFAULT 1,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_staff_contacts_role ON staff_contacts(role);
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_staff_contacts_role_name_active ON staff_contacts(role, name) WHERE is_active = 1;
+
     CREATE TABLE IF NOT EXISTS company_info (
       id      INTEGER PRIMARY KEY CHECK (id = 1),
       name    TEXT NOT NULL,

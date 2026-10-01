@@ -28,11 +28,17 @@
       <div class="row g-2 mb-2">
         <div class="col-md-3">
           <label class="form-label small">NVKD</label>
-          <input name="sales_person" class="form-control form-control-sm" value="<%= delivery.sales_person || '' %>">
+          <input name="sales_person" class="form-control form-control-sm" value="<%= delivery.sales_person || '' %>" list="salesStaffList">
+          <datalist id="salesStaffList">
+            <% salesStaff.forEach(p => { %><option value="<%= p.name %>"><% }); %>
+          </datalist>
         </div>
         <div class="col-md-3">
           <label class="form-label small">Admin</label>
-          <input name="admin_name" class="form-control form-control-sm" value="<%= delivery.admin_name || '' %>">
+          <input name="admin_name" class="form-control form-control-sm" value="<%= delivery.admin_name || '' %>" list="adminList">
+          <datalist id="adminList">
+            <% admins.forEach(p => { %><option value="<%= p.name %>"><% }); %>
+          </datalist>
         </div>
         <div class="col-md-3">
           <label class="form-label small">Số đơn hàng</label>

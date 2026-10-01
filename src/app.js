@@ -72,6 +72,7 @@ app.use((req, res, next) => {
 app.use('/', require('./routes/dashboard'));
 app.use('/vehicles', require('./routes/vehicles'));
 app.use('/drivers', require('./routes/drivers'));
+app.use('/staff', require('./routes/staff'));
 app.use('/trips', require('./routes/trips'));
 app.use('/deliveries', require('./routes/deliveries'));
 app.use('/maintenances', require('./routes/maintenances'));
