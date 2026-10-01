@@ -73,6 +73,7 @@ app.use('/', require('./routes/dashboard'));
 app.use('/vehicles', require('./routes/vehicles'));
 app.use('/drivers', require('./routes/drivers'));
 app.use('/trips', require('./routes/trips'));
+app.use('/deliveries', require('./routes/deliveries'));
 app.use('/maintenances', require('./routes/maintenances'));
 app.use('/company', require('./routes/company'));
 app.use('/api', require('./routes/api'));

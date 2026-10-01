@@ -1,0 +1,88 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div class="page-title"><%= title %></div>
+  <a href="/deliveries/new" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>Thêm kế hoạch giao</a>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body py-2">
+    <form class="row g-2 align-items-end">
+      <div class="col-auto">
+        <label class="form-label small">Từ ngày</label>
+        <input type="date" name="date_from" class="form-control form-control-sm" value="<%= filters.date_from || '' %>">
+      </div>
+      <div class="col-auto">
+        <label class="form-label small">Đến ngày</label>
+        <input type="date" name="date_to" class="form-control form-control-sm" value="<%= filters.date_to || '' %>">
+      </div>
+      <div class="col-auto">
+        <label class="form-label small">Trạng thái</label>
+        <select name="status" class="form-select form-select-sm">
+          <option value="">Tất cả</option>
+          <% statuses.forEach(s => { %>
+            <option value="<%= s %>" <%= filters.status === s ? 'selected' : '' %>><%= s %></option>
+          <% }); %>
+        </select>
+      </div>
+      <div class="col-auto">
+        <label class="form-label small">Xe</label>
+        <select name="vehicle_id" class="form-select form-select-sm">
+          <option value="">Tất cả</option>
+          <% vehicles.forEach(v => { %>
+            <option value="<%= v.id %>" <%= filters.vehicle_id == v.id ? 'selected' : '' %>><%= v.plate_number %></option>
+          <% }); %>
+        </select>
+      </div>
+      <div class="col-auto">
+        <label class="form-label small">Khách hàng</label>
+        <input name="customer" class="form-control form-control-sm" value="<%= filters.customer || '' %>" placeholder="Tên khách...">
+      </div>
+      <div class="col-auto">
+        <button class="btn btn-primary btn-sm"><i class="bi bi-search me-1"></i>Lọc</button>
+        <a href="/deliveries" class="btn btn-outline-secondary btn-sm">Xoá</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0 small">
+        <thead>
+          <tr>
+            <th>Ngày</th><th>Trạng thái</th><th>Khách hàng</th><th>Xe</th><th>Tài xế</th><th>Giờ</th><th>Loại hàng</th><th>SL/ĐVT</th><th>Người nhận</th><th>SĐT</th><th>Chi phí</th><th>Ghi chú</th><th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (deliveries.length === 0) { %>
+            <tr><td colspan="13" class="text-muted text-center py-4">Chưa có kế hoạch giao hàng nào</td></tr>
+          <% } else { %>
+            <% deliveries.forEach(d => { %>
+              <% var cls = d.status === 'Đã giao' ? 'badge-safe' : d.status === 'Huỷ' ? 'badge-expired' : d.status === 'Đang giao' ? 'badge-warning' : 'bg-secondary'; %>
+              <tr>
+                <td><%= fd(d.delivery_date) %></td>
+                <td><span class="badge <%= cls %>"><%= d.status %></span></td>
+                <td class="fw-bold"><%= d.customer_name %></td>
+                <td><%= d.plate_number || '-' %></td>
+                <td><%= d.driver_name || '-' %></td>
+                <td><%= d.time_range || '-' %></td>
+                <td><%= d.product_type || '-' %></td>
+                <td><%= d.quantity ? Number(d.quantity).toLocaleString() : '-' %> <%= d.unit || '' %></td>
+                <td><%= d.receiver_name || '-' %></td>
+                <td><%= d.receiver_phone || '-' %></td>
+                <td><%= d.shipping_cost ? d.shipping_cost.toLocaleString() + ' đ' : '-' %></td>
+                <td class="text-truncate" style="max-width:160px"><%= d.notes || '' %></td>
+                <td class="text-nowrap">
+                  <a href="/deliveries/<%= d.id %>/edit" class="btn btn-outline-secondary btn-sm py-0"><i class="bi bi-pencil"></i></a>
+                  <form method="POST" action="/deliveries/<%= d.id %>/delete" class="d-inline" onsubmit="return confirm('Xoá kế hoạch giao hàng?')">
+                    <button class="btn btn-outline-danger btn-sm py-0"><i class="bi bi-trash"></i></button>
+                  </form>
+                </td>
+              </tr>
+            <% }); %>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

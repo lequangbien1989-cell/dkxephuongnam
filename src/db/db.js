@@ -92,6 +92,34 @@ async function initSchema() {
 
     CREATE INDEX IF NOT EXISTS idx_maint_vehicle ON maintenances(vehicle_id);
 
+    CREATE TABLE IF NOT EXISTS delivery_plans (
+      id               SERIAL PRIMARY KEY,
+      delivery_date    DATE NOT NULL,
+      customer_name    TEXT NOT NULL,
+      sales_person     TEXT,
+      admin_name       TEXT,
+      product_type     TEXT,
+      unit             TEXT,
+      quantity         NUMERIC,
+      vehicle_id       INTEGER REFERENCES vehicles(id) ON DELETE SET NULL,
+      driver_name      TEXT,
+      time_range       TEXT,
+      delivery_address TEXT,
+      receiver_name    TEXT,
+      receiver_phone   TEXT,
+      order_number     TEXT,
+      voucher_number   TEXT,
+      status           TEXT NOT NULL DEFAULT 'Chờ giao',
+      shipping_cost    INTEGER,
+      notes            TEXT,
+      created_at       TIMESTAMPTZ DEFAULT NOW(),
+      updated_at       TIMESTAMPTZ DEFAULT NOW()
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_delivery_plans_date ON delivery_plans(delivery_date);
+    CREATE INDEX IF NOT EXISTS idx_delivery_plans_status ON delivery_plans(status);
+    CREATE INDEX IF NOT EXISTS idx_delivery_plans_vehicle ON delivery_plans(vehicle_id);
+
     CREATE TABLE IF NOT EXISTS company_info (
       id      INTEGER PRIMARY KEY CHECK (id = 1),
       name    TEXT NOT NULL,

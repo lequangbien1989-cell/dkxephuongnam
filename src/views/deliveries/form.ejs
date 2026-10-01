@@ -1,0 +1,117 @@
+<div class="page-title"><%= title %></div>
+
+<div class="card">
+  <div class="card-body">
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="alert alert-danger py-2 small"><%= error %></div>
+    <% } %>
+    <form method="POST" action="/deliveries<%= delivery.id ? '/' + delivery.id : '' %>">
+      <div class="row g-2 mb-2">
+        <div class="col-md-3">
+          <label class="form-label small">Ngày giao <span class="text-danger">*</span></label>
+          <input type="date" name="delivery_date" class="form-control form-control-sm" value="<%= delivery.delivery_date || today %>" required>
+        </div>
+        <div class="col-md-5">
+          <label class="form-label small">Tên khách hàng <span class="text-danger">*</span></label>
+          <input name="customer_name" class="form-control form-control-sm" value="<%= delivery.customer_name || '' %>" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small">Trạng thái <span class="text-danger">*</span></label>
+          <select name="status" class="form-select form-select-sm" required>
+            <% statuses.forEach(s => { %>
+              <option value="<%= s %>" <%= (delivery.status || 'Chờ giao') === s ? 'selected' : '' %>><%= s %></option>
+            <% }); %>
+          </select>
+        </div>
+      </div>
+
+      <div class="row g-2 mb-2">
+        <div class="col-md-3">
+          <label class="form-label small">NVKD</label>
+          <input name="sales_person" class="form-control form-control-sm" value="<%= delivery.sales_person || '' %>">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small">Admin</label>
+          <input name="admin_name" class="form-control form-control-sm" value="<%= delivery.admin_name || '' %>">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small">Số đơn hàng</label>
+          <input name="order_number" class="form-control form-control-sm" value="<%= delivery.order_number || '' %>">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small">Số phiếu</label>
+          <input name="voucher_number" class="form-control form-control-sm" value="<%= delivery.voucher_number || '' %>">
+        </div>
+      </div>
+
+      <div class="row g-2 mb-2">
+        <div class="col-md-4">
+          <label class="form-label small">Loại hàng</label>
+          <input name="product_type" class="form-control form-control-sm" value="<%= delivery.product_type || '' %>" placeholder="VD: PIR, EPS, PK...">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small">Số lượng</label>
+          <input type="number" step="0.01" name="quantity" class="form-control form-control-sm" value="<%= delivery.quantity || '' %>">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small">Đơn vị</label>
+          <input name="unit" class="form-control form-control-sm" value="<%= delivery.unit || '' %>" placeholder="m2, tấm...">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small">Chi phí giao (VNĐ)</label>
+          <input type="number" name="shipping_cost" class="form-control form-control-sm" value="<%= delivery.shipping_cost || '' %>">
+        </div>
+      </div>
+
+      <div class="row g-2 mb-2">
+        <div class="col-md-3">
+          <label class="form-label small">Xe</label>
+          <select name="vehicle_id" class="form-select form-select-sm">
+            <option value="">-- Chọn xe --</option>
+            <% vehicles.forEach(v => { %>
+              <option value="<%= v.id %>" <%= delivery.vehicle_id == v.id ? 'selected' : '' %>><%= v.plate_number %></option>
+            <% }); %>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small">Tài xế</label>
+          <select name="driver_name" class="form-select form-select-sm">
+            <option value="">-- Chọn tài xế --</option>
+            <% drivers.forEach(d => { %>
+              <option value="<%= d.name %>" <%= delivery.driver_name === d.name ? 'selected' : '' %>><%= d.name %></option>
+            <% }); %>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small">Giờ giao</label>
+          <input name="time_range" class="form-control form-control-sm" placeholder="VD: 7-9, 6h30-9h30" value="<%= delivery.time_range || '' %>">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small">Điện thoại người nhận</label>
+          <input name="receiver_phone" class="form-control form-control-sm" value="<%= delivery.receiver_phone || '' %>">
+        </div>
+      </div>
+
+      <div class="row g-2 mb-2">
+        <div class="col-md-4">
+          <label class="form-label small">Người nhận</label>
+          <input name="receiver_name" class="form-control form-control-sm" value="<%= delivery.receiver_name || '' %>">
+        </div>
+        <div class="col-md-8">
+          <label class="form-label small">Địa chỉ giao</label>
+          <input name="delivery_address" class="form-control form-control-sm" value="<%= delivery.delivery_address || '' %>">
+        </div>
+      </div>
+
+      <div class="mb-2">
+        <label class="form-label small">Ghi chú</label>
+        <input name="notes" class="form-control form-control-sm" value="<%= delivery.notes || '' %>">
+      </div>
+
+      <div class="d-flex gap-2">
+        <button class="btn btn-primary btn-sm"><i class="bi bi-save me-1"></i>Lưu</button>
+        <a href="/deliveries" class="btn btn-outline-secondary btn-sm">Huỷ</a>
+      </div>
+    </form>
+  </div>
+</div>
