@@ -71,22 +71,18 @@
 
       <div class="row g-2 mb-2">
         <div class="col-md-3">
-          <label class="form-label small">Xe</label>
-          <select name="vehicle_id" class="form-select form-select-sm">
-            <option value="">-- Chọn xe --</option>
-            <% vehicles.forEach(v => { %>
-              <option value="<%= v.id %>" <%= delivery.vehicle_id == v.id ? 'selected' : '' %>><%= v.plate_number %></option>
-            <% }); %>
-          </select>
+          <label class="form-label small">Số xe</label>
+          <input name="vehicle_plate" class="form-control form-control-sm" value="<%= delivery.vehicle_plate || delivery.plate_number || '' %>" list="vehicleList" placeholder="VD: 51F-784.31">
+          <datalist id="vehicleList">
+            <% vehicles.forEach(v => { %><option value="<%= v.plate_number %>"><% }); %>
+          </datalist>
         </div>
         <div class="col-md-3">
           <label class="form-label small">Tài xế</label>
-          <select name="driver_name" class="form-select form-select-sm">
-            <option value="">-- Chọn tài xế --</option>
-            <% drivers.forEach(d => { %>
-              <option value="<%= d.name %>" <%= delivery.driver_name === d.name ? 'selected' : '' %>><%= d.name %></option>
-            <% }); %>
-          </select>
+          <input name="driver_name" class="form-control form-control-sm" value="<%= delivery.driver_name || '' %>" list="driverList">
+          <datalist id="driverList">
+            <% drivers.forEach(d => { %><option value="<%= d.name %>"><% }); %>
+          </datalist>
         </div>
         <div class="col-md-3">
           <label class="form-label small">Giờ giao</label>

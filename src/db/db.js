@@ -102,6 +102,7 @@ async function initSchema() {
       unit             TEXT,
       quantity         NUMERIC,
       vehicle_id       INTEGER REFERENCES vehicles(id) ON DELETE SET NULL,
+      vehicle_plate    TEXT,
       driver_name      TEXT,
       time_range       TEXT,
       delivery_address TEXT,
@@ -144,9 +145,10 @@ async function initSchema() {
     );
   `);
 
-  // Thêm cột vehicle_type nếu bảng vehicles đã tồn tại từ trước (Supabase đang chạy)
+  // Thêm cột nếu bảng đã tồn tại từ trước (Supabase đang chạy)
   try {
     await db.query(`ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS vehicle_type TEXT DEFAULT 'Toyota'`);
+    await db.query(`ALTER TABLE delivery_plans ADD COLUMN IF NOT EXISTS vehicle_plate TEXT`);
   } catch (e) {
     // Cột đã tồn tại hoặc lỗi không quan trọng
   }

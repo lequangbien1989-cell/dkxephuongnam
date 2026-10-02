@@ -37,6 +37,7 @@ function bodyToDelivery(body, id) {
     id,
     time_range: normalizeTimeRange(body.time_range) || null,
     vehicle_id: body.vehicle_id || null,
+    vehicle_plate: (body.vehicle_plate || '').trim() || null,
     quantity: body.quantity || null,
     shipping_cost: body.shipping_cost || null,
     status: STATUSES.includes(body.status) ? body.status : 'Chờ giao'
@@ -53,6 +54,7 @@ function values(d) {
     d.unit || null,
     d.quantity,
     d.vehicle_id,
+    d.vehicle_plate,
     d.driver_name || null,
     d.time_range,
     d.delivery_address || null,
@@ -98,8 +100,8 @@ router.get('/new', async (req, res) => {
 router.post('/', async (req, res) => {
   const delivery = bodyToDelivery(req.body);
   try {
-    await query(`INSERT INTO delivery_plans (delivery_date, customer_name, sales_person, admin_name, product_type, unit, quantity, vehicle_id, driver_name, time_range, delivery_address, receiver_name, receiver_phone, order_number, voucher_number, status, shipping_cost, notes)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)`, values(delivery));
+    await query(`INSERT INTO delivery_plans (delivery_date, customer_name, sales_person, admin_name, product_type, unit, quantity, vehicle_id, vehicle_plate, driver_name, time_range, delivery_address, receiver_name, receiver_phone, order_number, voucher_number, status, shipping_cost, notes)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)`, values(delivery));
     res.redirect('/deliveries');
   } catch (e) {
     const data = await formData();
@@ -118,7 +120,7 @@ router.get('/:id/edit', async (req, res) => {
 router.post('/:id', async (req, res) => {
   const delivery = bodyToDelivery(req.body, req.params.id);
   try {
-    await query(`UPDATE delivery_plans SET delivery_date=$1, customer_name=$2, sales_person=$3, admin_name=$4, product_type=$5, unit=$6, quantity=$7, vehicle_id=$8, driver_name=$9, time_range=$10, delivery_address=$11, receiver_name=$12, receiver_phone=$13, order_number=$14, voucher_number=$15, status=$16, shipping_cost=$17, notes=$18, updated_at=NOW() WHERE id=$19`,
+    await query(`UPDATE delivery_plans SET delivery_date=$1, customer_name=$2, sales_person=$3, admin_name=$4, product_type=$5, unit=$6, quantity=$7, vehicle_id=$8, vehicle_plate=$9, driver_name=$10, time_range=$11, delivery_address=$12, receiver_name=$13, receiver_phone=$14, order_number=$15, voucher_number=$16, status=$17, shipping_cost=$18, notes=$19, updated_at=NOW() WHERE id=$20`,
       [...values(delivery), req.params.id]);
     res.redirect('/deliveries');
   } catch (e) {
