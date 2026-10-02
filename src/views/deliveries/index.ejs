@@ -50,12 +50,12 @@
       <table class="table table-hover mb-0 small">
         <thead>
           <tr>
-            <th>Ngày</th><th>Trạng thái</th><th>Khách hàng</th><th>Xe</th><th>Tài xế</th><th>Giờ</th><th>Loại hàng</th><th>SL/ĐVT</th><th>Người nhận</th><th>SĐT</th><th>Chi phí</th><th>Ghi chú</th><th></th>
+            <th>Ngày</th><th>Trạng thái</th><th>Khách hàng</th><th>NVKD</th><th>Admin</th><th>Xe</th><th>Tài xế</th><th>Giờ</th><th>Loại hàng</th><th>SL/ĐVT</th><th>Người nhận</th><th>SĐT</th><th>Chi phí</th><th>Ghi chú</th><th></th>
           </tr>
         </thead>
         <tbody>
           <% if (deliveries.length === 0) { %>
-            <tr><td colspan="13" class="text-muted text-center py-4">Chưa có kế hoạch giao hàng nào</td></tr>
+            <tr><td colspan="15" class="text-muted text-center py-4">Chưa có kế hoạch giao hàng nào</td></tr>
           <% } else { %>
             <% deliveries.forEach(d => { %>
               <% var cls = d.status === 'Đã giao' ? 'badge-safe' : d.status === 'Huỷ' ? 'badge-expired' : d.status === 'Đang giao' ? 'badge-warning' : 'bg-secondary'; %>
@@ -63,6 +63,8 @@
                 <td><%= fd(d.delivery_date) %></td>
                 <td><span class="badge <%= cls %>"><%= d.status %></span></td>
                 <td class="fw-bold"><%= d.customer_name %></td>
+                <td><%= d.sales_person || '-' %></td>
+                <td><%= d.admin_name || '-' %></td>
                 <td><%= d.plate_number || '-' %></td>
                 <td><%= d.driver_name || '-' %></td>
                 <td><%= d.time_range || '-' %></td>
